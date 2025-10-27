@@ -34,11 +34,14 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    origin: [
+      "https://huddlenew.vercel.app",
+      "http://localhost:5173"
+    ],
     credentials: true,
-    maxAge: 14400,
   })
 );
+
 
 // Cloudinary config
 cloudinary.v2.config({
