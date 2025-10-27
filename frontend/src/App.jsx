@@ -1,28 +1,51 @@
 // App.jsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import HuddleLogin from './pages/HuddleLogin';
-import HuddleSignup from './pages/HuddleSignup';
-
-import Feed from './components/Feed';
-import Notifications from './components/Notifications';
-import Messages from './components/Messages';
-import Profile from './components/Profile';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import HuddleLogin from "./pages/HuddleLogin";
+import HuddleSignup from "./pages/HuddleSignup";
+import Feed from "./components/Feed";
+import Notifications from "./components/Notifications";
+import Profile from "./components/Profile";
+import PrivateRoute from "./components/PrivateRoute";
+import PublicRoute from "./components/PublicRoute";
+import UserAccount from "./components/UserAccount";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<HuddleLogin />} />
-        <Route path="/signup" element={<HuddleSignup />} />
-        
-        {/* Layout route: HomePage stays, body content changes */}
-        <Route path="/homepage" element={<HomePage />}>
-          <Route index element={<Feed />} />             {/* default / */}
+        {/* Public Routes */}
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <HuddleLogin />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <HuddleSignup />
+            </PublicRoute>
+          }
+        />
+
+        {/* Private Routes */}
+        <Route
+          path="/homepage"
+          element={
+            <PrivateRoute>
+              <HomePage />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<Feed />} />
           <Route path="feed" element={<Feed />} />
           <Route path="notifications" element={<Notifications />} />
-          <Route path="messages" element={<Messages />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="user/:userId" element={<UserAccount />} /> 
         </Route>
       </Routes>
     </Router>

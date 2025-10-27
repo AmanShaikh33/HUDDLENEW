@@ -1,47 +1,33 @@
+// index.js
 import express from "express";
-import cors from 'cors';
+import http from "http";
+import cors from "cors";
 import dotenv from "dotenv";
-import { connectDb } from "./database/db.js";
-import cloudinary from "cloudinary";
 import cookieParser from "cookie-parser";
-import { Chat } from "./models/ChatModel.js";
+import path from "path";
+import cloudinary from "cloudinary";
+import { connectDb } from "./database/db.js";
+import { setupSocket } from "./socket/socket.js";
+
+// Import routes
+import userRoutes from "./routes/userRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import postRoutes from "./routes/postRoutes.js";
+import messageRoutes from "./routes/messageRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import noteRoutes from "./routes/noteRoutes.js";
 import { isAuth } from "./middlewares/isAuth.js";
 import { User } from "./models/userModel.js";
-import { app, server } from "./socket/socket.js";
-import path from "path";
-import axios from 'axios';
+
+
 
 dotenv.config();
 
-// Remove or guard local-only reload ping — NOT for production
-// const url = `http://localhost:7000`;
-// const interval = 30000;
+const app = express();
+const server = http.createServer(app);
 
-// function reloadWebsite() {
-//   axios
-//     .get(url)
-//     .then((response) => {
-//       console.log(
-//         `Reloaded at ${new Date().toISOString()}: Status Code ${response.status}`
-//       );
-//     })
-//     .catch((error) => {
-//       console.error(
-//         `Error reloading at ${new Date().toISOString()}:`,
-//         error.message
-//       );
-//     });
-// }
-
-// if (process.env.NODE_ENV !== "production") {
-//   setInterval(reloadWebsite, interval);
-// }
-
-cloudinary.v2.config({
-  cloud_name: process.env.Cloudinary_Cloud_Name,
-  api_key: process.env.Cloudinary_Api,
-  api_secret: process.env.Cloudinary_Secret,
-});
+// Setup Socket.IO
+setupSocket(server);
 
 // Middlewares
 app.use(express.json());
@@ -54,26 +40,14 @@ app.use(
   })
 );
 
-// Routes - inline
-app.get("/api/messages/chats", isAuth, async (req, res) => {
-  try {
-    const chats = await Chat.find({ users: req.user._id }).populate({
-      path: "users",
-      select: "name profilePic",
-    });
-
-    chats.forEach((e) => {
-      e.users = e.users.filter(
-        (user) => user._id.toString() !== req.user._id.toString()
-      );
-    });
-
-    res.json(chats);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+// Cloudinary config
+cloudinary.v2.config({
+  cloud_name: process.env.Cloudinary_Cloud_Name,
+  api_key: process.env.Cloudinary_Api,
+  api_secret: process.env.Cloudinary_Secret,
 });
 
+// Routes
 app.get("/api/user/all", isAuth, async (req, res) => {
   try {
     const search = req.query.search || "";
@@ -88,35 +62,29 @@ app.get("/api/user/all", isAuth, async (req, res) => {
   }
 });
 
-// Imported routes
-import userRoutes from "./routes/userRoutes.js";
-import authRoutes from "./routes/authRoutes.js";
-import postRoutes from "./routes/postRoutes.js";
-import messageRoutes from "./routes/messageRoutes.js";
-
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/notes", noteRoutes);
 
-// Serve frontend static files
+
+// Serve frontend
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-// ✅ Health check route for Render
 app.get("/", (req, res) => {
   res.send("Server is running ✅");
 });
 
-// Catch-all to serve index.html
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 });
 
-// ✅ Correct: use Render's dynamic PORT
-const port = process.env.PORT || 5000;
-
-server.listen(port, () => {
-  console.log(`🚀 Server is running on http://localhost:${port}`);
+// Start server
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
   connectDb();
 });

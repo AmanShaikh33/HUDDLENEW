@@ -14,20 +14,33 @@ const HuddleLogin = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    try {
-      const res = await loginUser(formData);
-      alert(res.message);
-      navigate("/homepage", { replace: true }); // redirect to homepage/feed after login
-    } catch (err) {
-      setError(err.message || "Login failed");
-    } finally {
-      setLoading(false);
+  try {
+    // ✅ API call — cookie-based login
+    const res = await loginUser(formData);
+
+    console.log("✅ Login successful:", res);
+
+    // ✅ Store only user info, not token
+    if (res?.user) {
+      localStorage.setItem("user", JSON.stringify(res.user));
     }
-  };
+
+    // ✅ Optional success alert
+    if (res?.message) alert(res.message);
+
+    // ✅ Redirect to homepage
+    navigate("/homepage", { replace: true });
+  } catch (err) {
+    console.error("❌ Login error:", err);
+    setError(err.message || "Login failed. Please check your credentials.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
@@ -43,6 +56,7 @@ const HuddleLogin = () => {
             name="email"
             placeholder="Email"
             onChange={handleChange}
+            value={formData.email}
             required
             className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg text-sm focus:ring-yellow-500 focus:border-yellow-500 outline-none"
           />
@@ -51,6 +65,7 @@ const HuddleLogin = () => {
             name="password"
             placeholder="Password"
             onChange={handleChange}
+            value={formData.password}
             required
             className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg text-sm focus:ring-yellow-500 focus:border-yellow-500 outline-none"
           />
@@ -70,7 +85,7 @@ const HuddleLogin = () => {
 
         <div className="text-center mt-8">
           <p className="text-gray-600">
-            Don't have an account?{" "}
+            Don’t have an account?{" "}
             <Link
               to="/signup"
               className="text-purple-600 font-medium hover:text-purple-800 transition-colors duration-200"

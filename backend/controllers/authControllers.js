@@ -57,23 +57,29 @@ export const loginUser = TryCatch(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
-  if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) return res.status(400).json({ message: "Invalid credentials" });
+  if (!user)
+    return res.status(400).json({
+      message: "Invalid Credentials",
+    });
 
-  // Update lastLogin timestamp
-  user.lastLogin = Date.now();
-  await user.save();
+  const comparePassword = await bcrypt.compare(password, user.password);
 
-  // Generate JWT token
+  if (!comparePassword)
+    return res.status(400).json({
+      message: "Invalid Credentials",
+    });
+
   generateToken(user._id, res);
 
   res.json({
-    message: "User logged in successfully",
+    message: "User Logged in",
     user,
   });
 });
+
+
+
 
 // ---------------- LOGOUT USER ----------------
 export const logoutUser = TryCatch((req, res) => {

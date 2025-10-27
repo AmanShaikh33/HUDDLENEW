@@ -8,6 +8,7 @@ import {
   likeUnlikePost,
   newPost,
   commentOnPost,
+  getPost
 } from "../controllers/postControllers.js";
 import uploadFile from "../middlewares/multer.js";
 
@@ -24,6 +25,7 @@ router.post("/like/:id", isAuth, likeUnlikePost);
 
 
 router.delete("/comment/:id", isAuth, deleteComment);
-router.post("/:id/comment", commentOnPost);
+router.post("/:id/comment",isAuth, commentOnPost);
+router.get("/:id", isAuth, getPost);
 
 export default router;

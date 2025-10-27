@@ -1,5 +1,6 @@
 import TryCatch from "../utils/Trycatch.js";
 import { User } from "../models/userModel.js";
+import { Notification } from "../models/Notification.js";
 import getDataUrl from "../utils/urlGenrator.js";
 import cloudinary from "cloudinary";
 import bcrypt from "bcrypt";
@@ -45,7 +46,7 @@ export const followandUnfollowUser = TryCatch(async (req, res) => {
   let badgeUnlocked = false;
 
   if (user.followers.includes(loggedInUser._id)) {
-    // Unfollow
+    // 🟥 UNFOLLOW
     user.followers = user.followers.filter(
       (id) => id.toString() !== loggedInUser._id.toString()
     );
@@ -54,12 +55,22 @@ export const followandUnfollowUser = TryCatch(async (req, res) => {
     );
     action = "unfollowed";
   } else {
-    // Follow
+    // 🟩 FOLLOW
     user.followers.push(loggedInUser._id);
     loggedInUser.followings.push(user._id);
     action = "followed";
 
-    // Badge logic after push
+    // ✅ Create follow notification
+    if (user._id.toString() !== loggedInUser._id.toString()) {
+      await Notification.create({
+        recipient: user._id,           // who receives the notification
+        sender: loggedInUser._id,      // who triggered it
+        type: "follow",
+        message: `${loggedInUser.name} started following you`,
+      });
+    }
+
+    // 🏅 Badge logic
     const followerCount = user.followers.length;
     if (followerCount === 1 && !user.badges.oneFollower) {
       user.badges.oneFollower = true;
@@ -105,44 +116,32 @@ export const userFollowerandFollowingData = TryCatch(async (req, res) => {
 // ------------------- UPDATE PROFILE -------------------
 export const updateProfile = TryCatch(async (req, res) => {
   const user = await User.findById(req.user._id);
-  const { name, username, bio } = req.body;
-  const file = req.file; // profile pic
-  const coverFile = req.body.coverFile; // optional cover photo
+  const { name, email, bio } = req.body;
 
-  // Update basic info
   if (name) user.name = name;
-  if (bio !== undefined) user.bio = bio;
+  if (email) user.email = email;
+  if (bio) user.bio = bio;
 
-  if (username && username !== user.username) {
-    const existing = await User.findOne({ username });
-    if (existing && existing._id.toString() !== user._id.toString())
-      return res.status(400).json({ message: "Username already taken" });
-    user.username = username;
-  }
+  if (req.file) {
+    const fileUrl = getDataUrl(req.file);
 
-  // Profile picture
-  if (file) {
-    if (user.profilePic?.id) await cloudinary.v2.uploader.destroy(user.profilePic.id);
-    const fileUrl = getDataUrl(file);
+    if (user.profilePic?.id) {
+      await cloudinary.v2.uploader.destroy(user.profilePic.id);
+    }
+
     const uploaded = await cloudinary.v2.uploader.upload(fileUrl.content);
-    user.profilePic = { id: uploaded.public_id, url: uploaded.secure_url };
-  }
-
-  // Cover photo
-  if (coverFile) {
-    if (user.coverPhoto?.id) await cloudinary.v2.uploader.destroy(user.coverPhoto.id);
-    const coverUrl = getDataUrl(coverFile);
-    const uploadedCover = await cloudinary.v2.uploader.upload(coverUrl.content);
-    user.coverPhoto = { id: uploadedCover.public_id, url: uploadedCover.secure_url };
+    user.profilePic = {
+      id: uploaded.public_id,
+      url: uploaded.secure_url,
+    };
   }
 
   await user.save();
 
-  res.json({
-    message: "Profile updated successfully",
-    user,
-  });
+  res.json({ message: "Profile updated", user });
 });
+
+
 
 // ------------------- UPDATE PASSWORD -------------------
 export const updatePassword = TryCatch(async (req, res) => {

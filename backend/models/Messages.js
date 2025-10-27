@@ -2,16 +2,34 @@ import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema(
   {
-    chatId: {
+    sender: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Chat",
+      ref: "User",
+      required: true,
     },
-    sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    text: String,
+    receiver: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    content: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    timestamp: {
+      type: Date,
+      default: Date.now,
+    },
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-export const Messages = mongoose.model("Messages", messageSchema);
+// Index for efficient querying (e.g., chat history between two users)
+messageSchema.index({ sender: 1, receiver: 1, timestamp: -1 });
+
+export const Message = mongoose.model("Message", messageSchema);
