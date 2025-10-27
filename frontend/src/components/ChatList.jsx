@@ -52,13 +52,14 @@ useEffect(() => {
   }, [search]);
 
   useEffect(() => {
-    socketRef.on("receiveMessage", (message) => {
-      setUnreadCounts(prev => ({
-        ...prev,
-        [message.sender._id]: (prev[message.sender._id] || 0) + 1
-      }));
-    });
-    return () => socketRef.off("receiveMessage");
+    socketRef.current.on("receiveMessage", (message) => {
+  setUnreadCounts(prev => ({
+    ...prev,
+    [message.sender._id]: (prev[message.sender._id] || 0) + 1
+  }));
+});
+return () => socketRef.current.off("receiveMessage");
+
   }, [socketRef]);
 
   const handleUserClick = async (user) => {
