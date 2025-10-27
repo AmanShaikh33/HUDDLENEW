@@ -3,7 +3,7 @@ import { User } from "../models/userModel.js";
 import { Notification } from "../models/Notification.js";
 import getDataUrl from "../utils/urlGenrator.js";
 import cloudinary from "cloudinary";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 // ------------------- GET OWN PROFILE -------------------
 export const myProfile = TryCatch(async (req, res) => {

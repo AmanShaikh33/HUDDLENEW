@@ -2,7 +2,7 @@ import { User } from "../models/userModel.js";
 import TryCatch from "../utils/Trycatch.js";
 import generateToken from "../utils/generateToken.js";
 import getDataUrl from "../utils/urlGenrator.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import cloudinary from "cloudinary";
 
 // ---------------- REGISTER USER ----------------
