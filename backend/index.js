@@ -1,4 +1,5 @@
 // index.js
+
 import express from "express";
 import http from "http";
 import cors from "cors";
@@ -9,7 +10,6 @@ import cloudinary from "cloudinary";
 import { connectDb } from "./database/db.js";
 import { setupSocket } from "./socket/socket.js";
 
-// Import routes
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
@@ -19,8 +19,6 @@ import noteRoutes from "./routes/noteRoutes.js";
 import { isAuth } from "./middlewares/isAuth.js";
 import { User } from "./models/userModel.js";
 
-
-
 dotenv.config();
 
 console.log("🚀 Using CORS Origin:", process.env.CORS_ORIGIN);
@@ -28,28 +26,28 @@ console.log("🚀 Using CORS Origin:", process.env.CORS_ORIGIN);
 const app = express();
 const server = http.createServer(app);
 
-// Setup Socket.IO
-setupSocket(server);
-
-// Middlewares
-app.use(express.json());
-app.use(cookieParser());
+// ✅ Apply CORS FIRST — before JSON or cookieParser
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
     credentials: true,
-    maxAge: 14400,
   })
 );
 
-// Cloudinary config
+app.use(express.json());
+app.use(cookieParser());
+
+// Setup Socket.IO
+setupSocket(server);
+
+// ✅ Cloudinary config
 cloudinary.v2.config({
   cloud_name: process.env.Cloudinary_Cloud_Name,
   api_key: process.env.Cloudinary_Api,
   api_secret: process.env.Cloudinary_Secret,
 });
 
-// Routes
+// ✅ Routes
 app.get("/api/user/all", isAuth, async (req, res) => {
   try {
     const search = req.query.search || "";
@@ -71,8 +69,7 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/notes", noteRoutes);
 
-
-// Serve frontend
+// ✅ Serve frontend (optional for local testing)
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
@@ -84,7 +81,7 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 });
 
-// Start server
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
