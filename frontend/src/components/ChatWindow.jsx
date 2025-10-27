@@ -14,14 +14,17 @@ const ChatWindow = () => {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:7000", { withCredentials: true });
+  socketRef.current = io(import.meta.env.VITE_API_BASE_URL, { withCredentials: true });
 
-    socketRef.current.on("receiveMessage", (message) => {
-      setMessages((prev) => [...prev, message]);
-    });
+  socketRef.current.on("receiveMessage", (message) => {
+    setMessages((prev) => [...prev, message]);
+  });
 
-    return () => socketRef.current.disconnect();
-  }, []);
+  return () => {
+    socketRef.current.disconnect(); // cleanup when component unmounts
+  };
+}, []);
+
 
   useEffect(() => {
     if (!selectedUser) return;

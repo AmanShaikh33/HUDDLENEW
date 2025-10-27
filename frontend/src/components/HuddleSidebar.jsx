@@ -52,7 +52,8 @@ const HuddleSidebar = ({
     };
     fetchUnread();
 
-    socketRef.current = io("http://localhost:7000", { withCredentials: true });
+    socketRef.current = io(import.meta.env.VITE_API_BASE_URL, { withCredentials: true });
+
 
     socketRef.current.on("receiveMessage", (msg) => {
       if (msg.receiver === user._id) {

@@ -45,7 +45,8 @@ const HuddleSidebar = ({ onCreatePost, onShowProfile, onShowMessages }) => {
     fetchUnread();
 
     // Setup Socket.IO for real-time unread messages
-    socketRef.current = io("http://localhost:7000", { withCredentials: true });
+    socketRef.current = io(import.meta.env.VITE_API_BASE_URL, { withCredentials: true });
+
 
     socketRef.current.on("receiveMessage", (msg) => {
       // If someone sends message to me

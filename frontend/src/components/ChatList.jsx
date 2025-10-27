@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext,useRef } from "react";
 import { ChatContext } from "../context/ChatContext";
 import { getMyProfile, getFollowersOrFollowings, getUnreadCounts, markMessagesAsRead } from "../../api/api";
 import { io } from "socket.io-client";
@@ -9,7 +9,12 @@ const ChatList = () => {
   const [loading, setLoading] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState({});
   const { setSelectedUser } = useContext(ChatContext);
-  const socketRef = useState(() => io("http://localhost:7000", { withCredentials: true }))[0];
+  const socketRef = useRef(null);
+
+useEffect(() => {
+  socketRef.current = io(import.meta.env.VITE_API_BASE_URL, { withCredentials: true });
+  return () => socketRef.current.disconnect();
+}, []);
 
   useEffect(() => {
     const fetchMutuals = async () => {
