@@ -6,10 +6,12 @@ const generateToken = (id, res) => {
   });
 
   res.cookie("token", token, {
-    maxAge: 15 * 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    sameSite: "strict",
-  });
+  maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
+  httpOnly: true,
+  secure: true,        // ✅ required for HTTPS (Render)
+  sameSite: "None",    // ✅ allows cross-domain cookie
+});
+
 };
 
 export default generateToken;
