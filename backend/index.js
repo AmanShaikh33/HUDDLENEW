@@ -23,6 +23,8 @@ import { User } from "./models/userModel.js";
 
 dotenv.config();
 
+console.log("🚀 Using CORS Origin:", process.env.CORS_ORIGIN);
+
 const app = express();
 const server = http.createServer(app);
 
@@ -34,14 +36,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: [
-      "https://huddlenew.vercel.app",
-      "http://localhost:5173"
-    ],
+    origin: process.env.CORS_ORIGIN,
     credentials: true,
+    maxAge: 14400,
   })
 );
-
 
 // Cloudinary config
 cloudinary.v2.config({
