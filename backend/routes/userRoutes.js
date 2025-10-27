@@ -19,6 +19,6 @@ router.post("/update-password/:id", isAuth, updatePassword);
 router.put('/update-profile/:id', isAuth, uploadFile, updateProfile);
 router.post("/follow/:id", isAuth, followandUnfollowUser);
 router.get("/followdata/:id", isAuth, userFollowerandFollowingData);
-router.get("/connections/:id", isAuth, getFollowersOrFollowings);
+router.get("/connections/:id", isAuth, getFollowersOrFollowings);    //adding comment
 
 export default router;
