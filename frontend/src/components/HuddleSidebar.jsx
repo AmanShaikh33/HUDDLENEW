@@ -1,24 +1,23 @@
 import React, { useEffect, useState, useRef } from "react";
-import { NavLink } from "react-router-dom";
-import { Home, Bell, MessageSquare, User, CheckCircle } from "lucide-react";
+import {
+  Home,
+  Bell,
+  MessageSquare,
+  User,
+  StickyNote,
+  CheckCircle
+} from "lucide-react";
 import { getMyProfile, getUnreadCounts } from "../../api/api";
 import { io } from "socket.io-client";
 import EditProfileModal from "./EditProfileModal";
-import H from "../assets/H.png";
-
-const navItems = [
-  { name: "Home", icon: Home, path: "/" },
-  { name: "Notifications", icon: Bell, path: null }, // Will use callback
-  { name: "Messages", icon: MessageSquare, path: null }, // Keep as button
-  { name: "Profile", icon: User, path: null, verified: true }, // Will use callback
-];
 
 const HuddleSidebar = ({
   onCreatePost,
   onShowProfile,
   onShowMessages,
-  onShowNotifications, // ✅ new
-  activeItem, // string: "Home" | "Notifications" | "Messages" | "Profile"
+  onShowNotifications,
+  onShowNotes,
+  activeItem
 }) => {
   const [user, setUser] = useState(null);
   const [hasUnread, setHasUnread] = useState(false);
@@ -38,22 +37,24 @@ const HuddleSidebar = ({
     fetchUser();
   }, []);
 
-  // Fetch unread messages + setup Socket.IO
+  // Fetch unread + setup Socket.IO
   useEffect(() => {
     if (!user) return;
 
     const fetchUnread = async () => {
       try {
-        const counts = await getUnreadCounts(); // [{ userId, count }]
+        const counts = await getUnreadCounts();
         setHasUnread(counts.length > 0);
       } catch (err) {
         console.error(err);
       }
     };
+
     fetchUnread();
 
-    socketRef.current = io(import.meta.env.VITE_API_BASE_URL, { withCredentials: true });
-
+    socketRef.current = io(import.meta.env.VITE_API_BASE_URL, {
+      withCredentials: true
+    });
 
     socketRef.current.on("receiveMessage", (msg) => {
       if (msg.receiver === user._id) {
@@ -71,132 +72,189 @@ const HuddleSidebar = ({
 
   const renderAvatar = () => {
     if (user?.profilePic?.url) {
-      return <img src={user.profilePic.url} alt="Profile" className="w-10 h-10 rounded-full" />;
-    } else if (user?.username) {
+      return (
+        <img
+          src={user.profilePic.url}
+          alt="Profile"
+          className="w-10 h-10 rounded-full"
+        />
+      );
+    }
+    if (user?.username) {
       return (
         <div className="w-10 h-10 rounded-full bg-yellow-600 flex items-center justify-center text-white font-bold">
           {user.username.charAt(0).toUpperCase()}
         </div>
       );
-    } else {
-      return <div className="w-10 h-10 rounded-full bg-gray-300" />;
     }
+    return <div className="w-10 h-10 rounded-full bg-gray-300" />;
   };
 
   return (
-    <div className="w-64 p-4 flex flex-col justify-between h-full bg-white border-r border-gray-100">
-      <div>
-        {/* Logo */}
-        
+    <>
+      {/* ======================== DESKTOP SIDEBAR ======================== */}
+      <div className="hidden md:flex w-64 p-4 flex-col justify-between h-full bg-white border-r border-gray-100">
 
-        {/* Sidebar Navigation */}
-     <nav className="space-y-2">
-  {navItems.map((item) => {
-    // Profile Button
-    if (item.name === "Profile") {
-      return (
-        <button
-          key={item.name}
-          onClick={onShowProfile}
-          className={`flex w-full items-center p-3 rounded-xl transition-colors duration-200 ${
-            activeItem === "Profile"
-              ? "bg-purple-100 text-purple-700 font-semibold"
-              : "text-gray-600 hover:bg-gray-50"
-          }`}
-        >
-          <item.icon className="w-5 h-5 mr-3" />
-          <span>{item.name}</span>
-          <CheckCircle className="w-4 h-4 ml-auto text-yellow-500" />
-        </button>
-      );
-    }
+        <nav className="space-y-2">
 
-    // Messages Button
-    if (item.name === "Messages") {
-      return (
-        <button
-          key={item.name}
-          onClick={handleMessagesClick}
-          className={`relative flex w-full items-center p-3 rounded-xl transition-colors duration-200 ${
-            activeItem === "Messages"
-              ? "bg-purple-100 text-purple-700 font-semibold"
-              : "text-gray-600 hover:bg-gray-50"
-          }`}
-        >
-          <item.icon className="w-5 h-5 mr-3" />
-          <span>{item.name}</span>
-          {hasUnread && <span className="absolute right-3 top-3 w-2 h-2 bg-purple-600 rounded-full" />}
-        </button>
-      );
-    }
+          {/* HOME */}
+          <button
+            onClick={() => window.location.href = "/homepage"}
+            className={`flex items-center w-full p-3 rounded-xl transition ${
+              activeItem === "Home"
+                ? "bg-purple-100 text-purple-700 font-semibold"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            <Home className="w-5 h-5 mr-3" />
+            Home
+          </button>
 
-    // Notifications Button
-    if (item.name === "Notifications") {
-      return (
-        <button
-          key={item.name}
-          onClick={onShowNotifications}
-          className={`flex w-full items-center p-3 rounded-xl transition-colors duration-200 ${
-            activeItem === "Notifications"
-              ? "bg-purple-100 text-purple-700 font-semibold"
-              : "text-gray-600 hover:bg-gray-50"
-          }`}
-        >
-          <item.icon className="w-5 h-5 mr-3" />
-          <span>{item.name}</span>
-        </button>
-      );
-    }
+          {/* NOTIFICATIONS */}
+          <button
+            onClick={onShowNotifications}
+            className={`flex w-full items-center p-3 rounded-xl transition ${
+              activeItem === "Notifications"
+                ? "bg-purple-100 text-purple-700 font-semibold"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            <Bell className="w-5 h-5 mr-3" />
+            Notifications
+          </button>
 
-    // Home Button (instead of NavLink, use activeItem)
-    if (item.name === "Home") {
-      return (
-        <button
-          key={item.name}
-          onClick={() => {
-            // You need to handle Home click callback in parent (like onShowHome)
-            if (item.path) window.location.href = item.path; // optional: navigate to home
-          }}
-          className={`flex w-full items-center p-3 rounded-xl transition-colors duration-200 ${
-            activeItem === "Home"
-              ? "bg-purple-100 text-purple-700 font-semibold"
-              : "text-gray-600 hover:bg-gray-50"
-          }`}
-        >
-          <item.icon className="w-5 h-5 mr-3" />
-          <span>{item.name}</span>
-        </button>
-      );
-    }
+          {/* MESSAGES */}
+          <button
+            onClick={handleMessagesClick}
+            className={`relative flex w-full items-center p-3 rounded-xl transition ${
+              activeItem === "Messages"
+                ? "bg-purple-100 text-purple-700 font-semibold"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            <MessageSquare className="w-5 h-5 mr-3" />
+            Messages
+            {hasUnread && (
+              <span className="absolute right-3 top-3 w-2 h-2 bg-purple-600 rounded-full" />
+            )}
+          </button>
 
-    return null;
-  })}
-</nav>
+          {/* NOTES */}
+          <button
+            onClick={onShowNotes}
+            className={`flex w-full items-center p-3 rounded-xl transition ${
+              activeItem === "Notes"
+                ? "bg-purple-100 text-purple-700 font-semibold"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            <StickyNote className="w-5 h-5 mr-3" />
+            Notes
+          </button>
 
+          {/* PROFILE */}
+          <button
+            onClick={onShowProfile}
+            className={`flex w-full items-center p-3 rounded-xl transition ${
+              activeItem === "Profile"
+                ? "bg-purple-100 text-purple-700 font-semibold"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            <User className="w-5 h-5 mr-3" />
+            Profile
+            <CheckCircle className="w-4 h-4 ml-auto text-yellow-500" />
+          </button>
+        </nav>
 
-        {/* Create Post Button */}
+        {/* CREATE POST */}
         <button
           onClick={onCreatePost}
-          className="mt-8 w-full py-3 rounded-xl bg-purple-600 text-white font-semibold shadow-md hover:bg-purple-700 transition-colors duration-200"
+          className="mt-8 w-full py-3 rounded-xl bg-purple-600 text-white font-semibold shadow-md hover:bg-purple-700 transition"
         >
           Create Post
         </button>
-      </div>
 
-      {/* User Info (Edit Profile Trigger) */}
-      <div className="flex items-center p-2 mt-auto cursor-pointer" onClick={() => setShowEditModal(true)}>
-        {renderAvatar()}
-        <div className="ml-3">
-          <div className="text-sm font-semibold text-gray-800">{user?.username || "User"}</div>
-          <div className="text-xs text-gray-500 hover:text-purple-600 transition">Edit Profile</div>
+        {/* USER INFO */}
+        <div
+          className="flex items-center p-2 mt-auto cursor-pointer"
+          onClick={() => setShowEditModal(true)}
+        >
+          {renderAvatar()}
+          <div className="ml-3">
+            <div className="text-sm font-semibold text-gray-800">
+              {user?.username || "User"}
+            </div>
+            <div className="text-xs text-gray-500 hover:text-purple-600">
+              Edit Profile
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Edit Profile Modal */}
+      {/* ======================== MOBILE BOTTOM NAV ======================== */}
+      <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-300 shadow-lg z-50">
+        <div className="flex justify-around py-3">
+
+          {/* HOME */}
+          <button onClick={() => window.location.href="/homepage"} className="flex flex-col items-center">
+            <Home
+              className={`w-6 h-6 ${
+                activeItem === "Home" ? "text-purple-600" : "text-gray-600"
+              }`}
+            />
+          </button>
+
+          {/* MESSAGES */}
+          <button onClick={handleMessagesClick} className="relative flex flex-col items-center">
+            <MessageSquare
+              className={`w-6 h-6 ${
+                activeItem === "Messages" ? "text-purple-600" : "text-gray-600"
+              }`}
+            />
+            {hasUnread && (
+              <span className="absolute top-0 right-3 w-2 h-2 bg-purple-600 rounded-full" />
+            )}
+          </button>
+
+          {/* NOTES */}
+          <button onClick={onShowNotes} className="flex flex-col items-center">
+            <StickyNote
+              className={`w-6 h-6 ${
+                activeItem === "Notes" ? "text-purple-600" : "text-gray-600"
+              }`}
+            />
+          </button>
+
+          {/* NOTIFICATIONS */}
+          <button onClick={onShowNotifications} className="flex flex-col items-center">
+            <Bell
+              className={`w-6 h-6 ${
+                activeItem === "Notifications" ? "text-purple-600" : "text-gray-600"
+              }`}
+            />
+          </button>
+
+          {/* PROFILE */}
+          <button onClick={onShowProfile} className="flex flex-col items-center">
+            <User
+              className={`w-6 h-6 ${
+                activeItem === "Profile" ? "text-purple-600" : "text-gray-600"
+              }`}
+            />
+          </button>
+        </div>
+      </div>
+
+      {/* EDIT PROFILE MODAL */}
       {showEditModal && (
-        <EditProfileModal onClose={() => setShowEditModal(false)} currentUser={user} setUser={setUser} />
+        <EditProfileModal
+          onClose={() => setShowEditModal(false)}
+          currentUser={user}
+          setUser={setUser}
+        />
       )}
-    </div>
+    </>
   );
 };
 

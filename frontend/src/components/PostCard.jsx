@@ -18,23 +18,23 @@ import CommentsModal from "./CommentsModal";
 
 const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
   const [post, setPost] = useState(null);
-  const [currentUserId, setCurrentUserId] = useState(null); 
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [liked, setLiked] = useState(false);
   const [loadingLike, setLoadingLike] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false); 
-  const [isEditing, setIsEditing] = useState(false); 
-  const [newCaption, setNewCaption] = useState(""); 
-  const menuRef = useRef(null); 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newCaption, setNewCaption] = useState("");
+  const menuRef = useRef(null);
 
-  // Effect for fetching the post data
+  // Fetch post
   useEffect(() => {
     const fetchPost = async () => {
       try {
         const data = await getPostById(postId);
         setPost(data);
-        const loggedInUserId = data.currentUserId; 
-        setCurrentUserId(loggedInUserId); 
+        const loggedInUserId = data.currentUserId;
+        setCurrentUserId(loggedInUserId);
         setLiked(data.likes.includes(loggedInUserId));
         setNewCaption(data.caption);
       } catch (err) {
@@ -44,7 +44,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
     fetchPost();
   }, [postId]);
 
-  // Effect to handle clicking outside the three-dot menu
+  // Close menu when clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -59,31 +59,29 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
   }, []);
 
   const handleLike = async () => {
-  if (!post || !currentUserId) return;
-  setLoadingLike(true);
-  try {
-    await likeUnlikePost(post._id);
+    if (!post || !currentUserId) return;
+    setLoadingLike(true);
 
-    // Update likes array based on current post state
-    setPost((prev) => {
-      const isLiked = prev.likes.includes(currentUserId);
-      return {
-        ...prev,
-        likes: isLiked
-          ? prev.likes.filter((id) => id !== currentUserId)
-          : [...prev.likes, currentUserId],
-      };
-    });
+    try {
+      await likeUnlikePost(post._id);
 
-    // Toggle liked state for UI
-    setLiked((prevLiked) => !prevLiked);
-  } catch (err) {
-    console.error(err.message);
-  } finally {
-    setLoadingLike(false);
-  }
-};
+      setPost((prev) => {
+        const isLiked = prev.likes.includes(currentUserId);
+        return {
+          ...prev,
+          likes: isLiked
+            ? prev.likes.filter((id) => id !== currentUserId)
+            : [...prev.likes, currentUserId],
+        };
+      });
 
+      setLiked((prevLiked) => !prevLiked);
+    } catch (err) {
+      console.error(err.message);
+    } finally {
+      setLoadingLike(false);
+    }
+  };
 
   const handleDeletePost = async () => {
     if (!window.confirm("Are you sure you want to delete this post?")) {
@@ -93,15 +91,12 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
 
     try {
       await deletePost(post._id);
-      
-      // 1. Call the prop function to remove the post from the parent's list
+
       if (onDeleteSuccess) {
         onDeleteSuccess(post._id);
       }
-      
-      // 2. Add success message
-      alert("Post deleted successfully!"); 
 
+      alert("Post deleted successfully!");
     } catch (err) {
       console.error(err.message);
       alert("Failed to delete post.");
@@ -116,10 +111,14 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
     }
 
     try {
-      const updatedPostResponse = await editPostCaption(post._id, newCaption);
-      const updatedPost = updatedPostResponse.post || updatedPostResponse; 
+      const updatedPostResponse = await editPostCaption(
+        post._id,
+        newCaption
+      );
+      const updatedPost = updatedPostResponse.post || updatedPostResponse;
 
       setPost((prev) => ({ ...prev, caption: updatedPost.caption }));
+
       if (onEditSuccess) {
         onEditSuccess(post._id, updatedPost.caption);
       }
@@ -133,23 +132,33 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
     }
   };
 
-  if (!post || !currentUserId) return null; 
+  if (!post || !currentUserId) return null;
 
   const { owner, caption, files } = post;
-  const isOwner = currentUserId === owner._id; 
+  const isOwner = currentUserId === owner._id;
 
   return (
     <>
       <div
-        className="w-full bg-white p-4 rounded-3xl shadow-xl transition-all hover:shadow-2xl relative"
+        className="
+            w-full 
+    bg-white 
+    p-3 sm:p-4 
+    rounded-3xl 
+    shadow-xl 
+    hover:shadow-2xl 
+    transition-all 
+    relative 
+    max-w-full 
+    mx-auto
+        "
         onClick={() => setIsModalOpen(true)}
       >
-        {/* Post Header */}
+        {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center">
-            {/* ... Profile details ... */}
             <div className="w-10 h-10 bg-gray-300 rounded-full mr-3 overflow-hidden flex items-center justify-center text-white font-bold text-lg">
-              {owner.profilePic.url ? (              
+              {owner.profilePic?.url ? (
                 <img
                   src={owner.profilePic.url}
                   alt={owner.username}
@@ -159,22 +168,24 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
                 owner.username.charAt(0).toUpperCase()
               )}
             </div>
+
             <div>
-              <div className="flex items-center text-base font-semibold text-gray-800 leading-none">
+              <div className="flex items-center text-base font-semibold text-gray-800">
                 {owner.username}
-                <CheckCircle className="w-4 h-4 ml-1 text-yellow-500 fill-yellow-500" />
+                <CheckCircle className="w-4 h-4 ml-1 text-yellow-500" />
               </div>
-              <div className="text-xs text-gray-500 leading-tight mt-0.5">
+
+              <div className="text-xs text-gray-500">
                 @{owner.email.split("@")[0]}
               </div>
             </div>
           </div>
 
-          {/* Three-dot Menu for Owner Actions */}
-          {isOwner && ( 
+          {/* Menu */}
+          {isOwner && (
             <div className="relative" ref={menuRef}>
               <button
-                className="p-1 rounded-full text-gray-500 hover:bg-gray-100 transition-colors"
+                className="p-1 rounded-full text-gray-500 hover:bg-gray-100"
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsMenuOpen(!isMenuOpen);
@@ -182,13 +193,14 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
               >
                 <MoreVertical className="w-5 h-5" />
               </button>
+
               {isMenuOpen && (
                 <div
                   className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-10 py-1 border border-gray-100"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
-                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 transition-colors"
+                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-purple-50"
                     onClick={() => {
                       setIsEditing(true);
                       setIsMenuOpen(false);
@@ -197,8 +209,9 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
                     <Edit3 className="w-4 h-4 mr-2" />
                     Edit Caption
                   </button>
+
                   <button
-                    className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                     onClick={handleDeletePost}
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
@@ -210,7 +223,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
           )}
         </div>
 
-        {/* Post Text / Edit Input */}
+        {/* Caption */}
         <div className="mb-4 text-gray-700">
           {isEditing ? (
             <div
@@ -224,20 +237,22 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
                 rows="3"
                 autoFocus
               ></textarea>
+
               <div className="flex justify-end space-x-2 mt-2">
                 <button
                   onClick={() => {
                     setIsEditing(false);
                     setNewCaption(post.caption);
                   }}
-                  className="px-3 py-1 text-sm rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  className="px-3 py-1 text-sm bg-gray-200 rounded-full"
                 >
                   Cancel
                 </button>
+
                 <button
                   onClick={handleEditCaption}
                   disabled={!newCaption.trim()}
-                  className="px-3 py-1 text-sm rounded-full bg-purple-600 text-white disabled:opacity-50 hover:bg-purple-700"
+                  className="px-3 py-1 text-sm bg-purple-600 text-white rounded-full"
                 >
                   Save
                 </button>
@@ -246,7 +261,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
           ) : (
             <>
               <p className="mb-2 whitespace-pre-wrap">{caption}</p>
-              {caption?.match(/#\w+/g)?.map((tag, i) => ( 
+              {caption?.match(/#\w+/g)?.map((tag, i) => (
                 <span key={i} className="mr-2 font-semibold text-purple-600">
                   {tag}
                 </span>
@@ -255,34 +270,34 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
           )}
         </div>
 
-        {/* Media Preview (Code remains the same) */}
+        {/* Media */}
         {files?.length > 0 && (
-          <div className="w-full h-32 bg-gray-100 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+          <div className="w-full bg-gray-100 rounded-lg mb-4 overflow-hidden">
             {files[0].type === "image" ? (
               <img
                 src={files[0].url}
                 alt="post media"
-                className="w-full h-full object-cover"
+                className="w-full h-auto object-cover"
               />
             ) : (
               <video
                 src={files[0].url}
                 controls
-                className="w-full h-full object-cover"
+                className="w-full h-auto object-cover"
               />
             )}
           </div>
         )}
 
-        {/* Action Buttons (Code remains the same) */}
-        <div className="flex justify-center items-center mb-4 gap-4">
+        {/* Actions */}
+        <div className="flex flex-wrap justify-center items-center gap-3 mb-2">
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleLike();
             }}
             disabled={loadingLike}
-            className={`flex items-center space-x-1 px-4 py-2 rounded-full font-medium transition-colors ${
+            className={`flex items-center space-x-1 px-4 py-2 rounded-full font-medium transition ${
               liked
                 ? "bg-purple-600 text-white"
                 : "bg-purple-100 text-purple-600 hover:bg-purple-200"
@@ -297,22 +312,22 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
               e.stopPropagation();
               setIsModalOpen(true);
             }}
-            className="flex items-center space-x-1 px-4 py-2 rounded-full bg-purple-100 text-purple-600 font-medium transition-colors hover:bg-purple-200"
+            className="flex items-center space-x-1 px-4 py-2 rounded-full bg-purple-100 text-purple-600 hover:bg-purple-200"
           >
             <MessageSquare className="w-4 h-4" />
             <span>Comment</span>
           </button>
-
-      
         </div>
       </div>
 
-      {/* Comments Modal */}
+      {/* Modal */}
       {isModalOpen && (
-        <CommentsModal postId={post._id} 
-        liked={liked}              // pass current liked state
-        onToggleLike={handleLike}
-        onClose={() => setIsModalOpen(false)} />
+        <CommentsModal
+          postId={post._id}
+          liked={liked}
+          onToggleLike={handleLike}
+          onClose={() => setIsModalOpen(false)}
+        />
       )}
     </>
   );

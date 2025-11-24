@@ -22,11 +22,6 @@ const NotificationsPage = () => {
     }
   };
 
-  const handleMarkRead = async () => {
-    await markNotificationsRead();
-    fetchNotifications();
-  };
-
   const handleClear = async () => {
     await clearNotifications();
     setNotifications([]);
@@ -37,7 +32,9 @@ const NotificationsPage = () => {
       case "like":
         return <Heart className="w-5 h-5 text-pink-500 fill-pink-500" />;
       case "comment":
-        return <MessageSquare className="w-5 h-5 text-purple-500 fill-purple-500" />;
+        return (
+          <MessageSquare className="w-5 h-5 text-purple-500 fill-purple-500" />
+        );
       case "follow":
         return <User className="w-5 h-5 text-blue-500 fill-blue-500" />;
       default:
@@ -46,29 +43,36 @@ const NotificationsPage = () => {
   };
 
   return (
-    <div className="p-4 max-w-lg mx-auto">
-      <h2 className="text-xl font-bold mb-4">Notifications</h2>
+    <div className="p-4 max-w-lg mx-auto w-full">
+      <h2 className="text-xl font-bold mb-4 text-center md:text-left">
+        Notifications
+      </h2>
 
-      <div className="flex gap-2 mb-4">
-        
+      {/* Buttons Row */}
+      <div className="flex flex-wrap gap-2 mb-4 justify-center md:justify-start">
         <button
           onClick={handleClear}
-          className="bg-purple-600 text-white px-3 py-1 rounded-full hover:bg-purple-700 transition-colors"
+          className="bg-purple-600 text-white px-4 py-1.5 rounded-full hover:bg-purple-700 transition-colors text-sm"
         >
           Clear all
         </button>
       </div>
 
       {notifications.length === 0 ? (
-        <p className="text-gray-500 text-center">No notifications yet.</p>
+        <p className="text-gray-500 text-center text-sm">No notifications yet.</p>
       ) : (
         <div className="space-y-3">
           {notifications.map((n) => (
             <div
               key={n._id}
-              className="flex items-center p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200"
+              className="
+                flex items-center 
+                p-4 bg-white rounded-xl shadow-md 
+                hover:shadow-lg transition-shadow duration-200
+                w-full
+              "
             >
-              {/* Profile Image */}
+              {/* Profile */}
               <div className="flex-shrink-0 mr-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-yellow-300 ring-2 ring-yellow-300">
                   <img
@@ -79,18 +83,19 @@ const NotificationsPage = () => {
                 </div>
               </div>
 
-              {/* Notification Content */}
-              <div className="flex-grow text-sm">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <span className="font-semibold text-gray-800 mr-1">
+              {/* Text Content */}
+              <div className="flex-grow text-sm min-w-0">
+                <div className="flex items-center justify-between flex-wrap">
+                  <div className="flex items-center min-w-0">
+                    <span className="font-semibold text-gray-800 mr-1 truncate">
                       @{n.sender.username}
                     </span>
                     {n.sender.isVerified && (
-                      <CheckCircle className="w-3.5 h-3.5 text-blue-500" />
+                      <CheckCircle className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
                     )}
                   </div>
-                  <span className="text-xs text-gray-400 ml-2">
+
+                  <span className="text-xs text-gray-400 mt-1 md:mt-0">
                     {new Date(n.createdAt).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -99,12 +104,12 @@ const NotificationsPage = () => {
                 </div>
 
                 {/* Notification Text */}
-                <p className="text-gray-600 mt-0.5">
+                <p className="text-gray-600 mt-0.5 break-words">
                   {n.type === "like" && "liked your post"}
                   {n.type === "comment" && (
                     <>
                       commented:{" "}
-                      <span className="text-purple-600 font-medium">
+                      <span className="text-purple-600 font-medium break-words">
                         “{n.commentText}”
                       </span>
                     </>
@@ -113,7 +118,7 @@ const NotificationsPage = () => {
                 </p>
               </div>
 
-              {/* Right Icon */}
+              {/* Icon */}
               <div className="flex-shrink-0 ml-3">{getNotificationIcon(n.type)}</div>
             </div>
           ))}

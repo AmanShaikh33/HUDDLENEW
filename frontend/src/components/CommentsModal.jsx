@@ -9,13 +9,13 @@ const timeAgo = (dateString) => {
   const past = new Date(dateString);
   const diffInSeconds = Math.floor((now - past) / 1000);
 
-  if (diffInSeconds < 60) return `${diffInSeconds} sec${diffInSeconds !== 1 ? "s" : ""} ago`;
+  if (diffInSeconds < 60) return `${diffInSeconds} sec ago`;
   const diffInMinutes = Math.floor(diffInSeconds / 60);
-  if (diffInMinutes < 60) return `${diffInMinutes} min${diffInMinutes !== 1 ? "s" : ""} ago`;
+  if (diffInMinutes < 60) return `${diffInMinutes} min ago`;
   const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) return `${diffInHours} hour${diffInHours !== 1 ? "s" : ""} ago`;
+  if (diffInHours < 24) return `${diffInHours} hours ago`;
   const diffInDays = Math.floor(diffInHours / 24);
-  return `${diffInDays} day${diffInDays !== 1 ? "s" : ""} ago`;
+  return `${diffInDays} days ago`;
 };
 
 const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
@@ -23,7 +23,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
   const [commentText, setCommentText] = useState("");
   const [loading, setLoading] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
- const [Liked, setLiked] = useState(liked);
+  const [Liked, setLiked] = useState(liked);
 
   // Fetch post data
   useEffect(() => {
@@ -81,7 +81,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
   };
 
   if (!post) return null;
-  const { owner, files, comments, likes, caption, createdAt } = post;
+  const { owner, files, comments, caption, createdAt } = post;
 
   return (
     <>
@@ -93,7 +93,14 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
 
       {/* Modal */}
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-        <div className="w-[720px] max-w-full max-h-[90vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+        <div
+          className="
+            w-full max-w-[720px] max-h-[90vh]
+            bg-white rounded-3xl shadow-2xl
+            flex flex-col 
+            overflow-hidden
+          "
+        >
           {/* Header */}
           <div className="p-5 border-b border-gray-100 flex justify-between items-center flex-shrink-0 relative">
             <span className="text-xl font-bold text-gray-800 w-full text-center">
@@ -108,9 +115,10 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
           </div>
 
           {/* Main content */}
-          <div className="flex flex-1 min-h-0">
-            {/* Left - Post */}
-            <div className="w-1/2 p-5 flex flex-col border-r border-gray-100 flex-shrink-0">
+          <div className="flex flex-col md:flex-row flex-1 min-h-0">
+
+            {/* LEFT SIDE — HIDDEN ON MOBILE */}
+            <div className="hidden md:flex md:w-1/2 p-5 flex-col border-r border-gray-100">
               <div className="flex items-center mb-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
                   {owner.profilePic ? (
@@ -125,6 +133,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
                     </div>
                   )}
                 </div>
+
                 <div>
                   <div className="flex items-center text-sm font-semibold text-gray-800">
                     @{owner.username}
@@ -154,16 +163,16 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
 
               {/* Likes / Comments */}
               <div className="flex items-center justify-start space-x-6 text-gray-600">
-               <button
-  onClick={onToggleLike}
-  disabled={likeLoading}
-  className={`flex items-center font-medium text-sm transition-colors ${
-    liked ? "text-purple-600" : "text-gray-600"
-  }`}
->
-  <Heart className={`w-5 h-5 mr-2 ${liked ? "fill-purple-600" : ""}`} />
-  <span>{post?.likes.length} Likes</span>
-</button>
+                <button
+                  onClick={onToggleLike}
+                  disabled={likeLoading}
+                  className={`flex items-center font-medium text-sm transition-colors ${
+                    liked ? "text-purple-600" : "text-gray-600"
+                  }`}
+                >
+                  <Heart className={`w-5 h-5 mr-2 ${liked ? "fill-purple-600" : ""}`} />
+                  <span>{post?.likes.length} Likes</span>
+                </button>
 
                 <div className="flex items-center font-medium text-sm">
                   <MessageSquare className="w-5 h-5 mr-2 text-purple-600 fill-purple-600" />
@@ -175,17 +184,18 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
               <p className="mt-2 text-sm text-gray-700">{caption}</p>
             </div>
 
-            {/* Right - Comments */}
-            <div className="w-1/2 p-5 flex flex-col overflow-y-auto space-y-2">
+            {/* RIGHT SIDE — COMMENTS (FULL WIDTH ON MOBILE) */}
+            <div className="w-full md:w-1/2 p-5 flex flex-col flex-1 overflow-y-auto space-y-2">
               {comments.length > 0 ? (
                 comments.map((c, i) => {
-                  const userObj = c.user || { username: c.name || "User", profilePic: null };
+                  const userObj =
+                    c.user || { username: c.name || "User", profilePic: null };
+
                   return (
                     <div
                       key={c._id || i}
                       className="flex items-start py-2 bg-white rounded-xl shadow px-3"
                     >
-                      {/* Avatar */}
                       <div className="mr-3 flex-shrink-0">
                         {userObj.profilePic?.url ? (
                           <img
@@ -194,27 +204,12 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
                             className="w-8 h-8 rounded-full object-cover"
                           />
                         ) : (
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
-                              ["R", "M", "N", "P", "A"].includes(
-                                userObj.username.charAt(0).toUpperCase()
-                              )
-                                ? {
-                                    R: "bg-red-500",
-                                    M: "bg-green-500",
-                                    N: "bg-blue-500",
-                                    P: "bg-orange-500",
-                                    A: "bg-purple-500",
-                                  }[userObj.username.charAt(0).toUpperCase()]
-                                : "bg-gray-500"
-                            }`}
-                          >
+                          <div className="w-8 h-8 rounded-full bg-gray-500 text-white flex items-center justify-center font-bold">
                             {userObj.username.charAt(0).toUpperCase()}
                           </div>
                         )}
                       </div>
 
-                      {/* Comment text */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center text-xs text-gray-500 mb-0.5">
                           <span className="font-semibold text-gray-800 mr-1">
@@ -222,6 +217,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
                           </span>
                           <span>{timeAgo(c.createdAt)}</span>
                         </div>
+
                         <p className="text-sm text-gray-700 break-words">
                           {c.comment.split(/\s+/).map((word, idx) =>
                             word.startsWith("#") ? (

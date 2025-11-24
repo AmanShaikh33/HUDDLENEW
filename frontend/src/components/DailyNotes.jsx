@@ -7,9 +7,9 @@ const DailyNotes = () => {
   const [newNote, setNewNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
-  const [showMenuId, setShowMenuId] = useState(null); // track which note menu is open
+  const [showMenuId, setShowMenuId] = useState(null);
 
-  // Fetch logged-in user
+  // Fetch user
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -37,7 +37,7 @@ const DailyNotes = () => {
 
   useEffect(() => {
     fetchNotes();
-    const interval = setInterval(fetchNotes, 60 * 1000);
+    const interval = setInterval(fetchNotes, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -55,7 +55,6 @@ const DailyNotes = () => {
     }
   };
 
-  // Delete note
   const handleDeleteNote = async (noteId) => {
     try {
       setLoading(true);
@@ -70,28 +69,33 @@ const DailyNotes = () => {
   };
 
   return (
-    <div className="flex flex-col bg-white rounded-xl p-3 w-70 h-full">
-      <h3 className="text-md font-semibold mb-2 text-purple-600">Daily Thoughts</h3>
+    <div className="flex flex-col bg-white rounded-xl p-3 w-full md:w-72 shadow-sm border border-gray-200">
 
-      {/* New Note Input */}
-      <div className="flex mb-3 gap-2">
+      {/* Title */}
+      <h3 className="text-base md:text-lg font-semibold mb-3 text-purple-600">
+        Daily Thoughts
+      </h3>
+
+      {/* Input */}
+      <div className="flex mb-3 md:mb-4 gap-2">
         <input
           type="text"
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}
           placeholder="Share a thought..."
-          className="flex-1 text-sm border border-gray-300 rounded-full px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-purple-400"
+          className="flex-1 text-sm border border-gray-300 rounded-full px-3 py-2 focus:outline-none focus:ring-1 focus:ring-purple-400"
         />
         <button
           onClick={handleCreateNote}
-          className="bg-purple-600 text-white px-3 py-1.5 rounded-full text-sm hover:bg-purple-700 transition"
+          className="bg-purple-600 text-white px-4 py-2 rounded-full text-xs md:text-sm hover:bg-purple-700 transition"
         >
           Post
         </button>
       </div>
 
-      {/* Notes List */}
-      <div className="flex-1 overflow-y-auto space-y-2">
+      {/* Notes */}
+      <div className="space-y-3 max-h-[250px] md:max-h-full overflow-y-auto pr-1">
+
         {loading ? (
           <p className="text-gray-500 text-sm">Loading...</p>
         ) : notes.length === 0 ? (
@@ -100,8 +104,9 @@ const DailyNotes = () => {
           notes.map((note) => (
             <div
               key={note._id}
-              className="flex items-start justify-between gap-2 p-2 bg-purple-50 rounded-lg relative"
+              className="flex items-start justify-between gap-2 p-2 bg-purple-50 rounded-lg"
             >
+              {/* Avatar + note content */}
               <div className="flex items-start gap-2">
                 {note.user?.profilePic?.url ? (
                   <img
@@ -110,13 +115,16 @@ const DailyNotes = () => {
                     className="w-8 h-8 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center text-white text-sm font-semibold">
+                  <div className="w-8 h-8 rounded-full bg-purple-300 flex items-center justify-center text-white text-sm font-semibold">
                     {note.user?.name?.charAt(0).toUpperCase() || "U"}
                   </div>
                 )}
-                <div className="flex-1">
-                  <p className="text-xs font-semibold text-gray-700">{note.user?.name}</p>
-                  <p className="text-sm text-gray-800 truncate">{note.content}</p>
+
+                <div>
+                  <p className="text-xs font-semibold text-gray-700">
+                    {note.user?.name}
+                  </p>
+                  <p className="text-sm text-gray-800">{note.content}</p>
                   <p className="text-xs text-gray-400">
                     {new Date(note.expiresAt).toLocaleTimeString([], {
                       hour: "2-digit",
@@ -127,7 +135,7 @@ const DailyNotes = () => {
                 </div>
               </div>
 
-              {/* 3-dot menu */}
+              {/* Menu */}
               {note.user?._id === user?._id && (
                 <div className="relative">
                   <button
@@ -136,8 +144,9 @@ const DailyNotes = () => {
                     }
                     className="p-1 rounded hover:bg-purple-200"
                   >
-                    <MoreHorizontal size={16} />
+                    <MoreHorizontal size={18} />
                   </button>
+
                   {showMenuId === note._id && (
                     <div className="absolute right-0 top-full mt-1 w-24 bg-white border rounded shadow-md z-10">
                       <button
