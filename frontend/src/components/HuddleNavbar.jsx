@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// HuddleNavbar.jsx
+import React, { useState, useEffect, useRef } from "react";
 import { Search, LogOut, Menu } from "lucide-react";
 import { logoutUser, searchUsers } from "../../api/api";
 import H from "../assets/H.png";
@@ -8,6 +9,19 @@ const HuddleNavbar = ({ onUserSelect }) => {
   const [results, setResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+  const searchRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handler = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -41,129 +55,121 @@ const HuddleNavbar = ({ onUserSelect }) => {
 
   const handleSelectUser = (id) => {
     if (onUserSelect) onUserSelect(id);
+
+    window.dispatchEvent(new CustomEvent("openUserAccount", { detail: id }));
+
     setQuery("");
     setResults([]);
     setShowResults(false);
+    setShowMobileMenu(false);
   };
 
   return (
-    <div className="w-full h-20 px-4 sm:px-8 py-4 flex items-center justify-between bg-white border-b border-gray-100 shadow-sm rounded-xl relative">
+    <div className="w-full px-4 sm:px-8 py-4 bg-white border-b border-gray-100 shadow-sm rounded-xl sticky top-0 z-50">
 
-      {/* Left Section */}
-      <div className="flex items-center space-x-2">
-        <img
-          src={H}
-          alt="Huddle Logo"
-          className="w-12 h-12 rounded-full object-cover"
-        />
-        <span className="hidden sm:block text-2xl font-bold text-gray-800">
-          HUDDLE
-        </span>
-      </div>
+      <div className="flex items-center justify-between">
 
-      {/* Mobile Menu Button (Hamburger) */}
-      <button
-        onClick={() => setShowMobileMenu(!showMobileMenu)}
-        className="sm:hidden p-2 rounded-lg hover:bg-gray-100"
-      >
-        <Menu className="w-6 h-6 text-gray-700" />
-      </button>
+        {/* Left: Logo */}
+        <div className="flex items-center space-x-2">
+          <img src={H} alt="Huddle Logo" className="w-12 h-12 rounded-full" />
+          <span className="hidden sm:block text-2xl font-bold text-gray-800">
+            HUDDLE
+          </span>
+        </div>
 
-      {/* Search Bar */}
-      <div className="hidden sm:block relative w-96">
-        <input
-          type="text"
-          placeholder="Search users..."
-          value={query}
-          onChange={handleSearch}
-          className="w-full py-3 pl-12 pr-4 rounded-full border-2 border-yellow-400 focus:outline-none focus:border-yellow-500 bg-white placeholder-gray-500"
-        />
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+        {/* Hamburger (Mobile) */}
+        <button
+          onClick={() => setShowMobileMenu(!showMobileMenu)}
+          className="sm:hidden p-2 rounded-lg hover:bg-gray-100"
+        >
+          <Menu className="w-6 h-6 text-gray-700" />
+        </button>
 
-        {/* Search Suggestions */}
-        {showResults && results.length > 0 && (
-          <div className="absolute top-14 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
-            {results.map((user) => (
-              <div
-                key={user._id}
-                onClick={() => handleSelectUser(user._id)}
-                className="flex items-center gap-3 p-2 hover:bg-gray-100 cursor-pointer transition"
-              >
-                {user.profilePic?.url ? (
-                  <img
-                    src={user.profilePic.url}
-                    className="w-8 h-8 rounded-full object-cover"
-                    alt={user.username}
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-yellow-600 text-white flex items-center justify-center font-bold">
-                    {user.username.charAt(0).toUpperCase()}
+        {/* Search Bar – visible on ALL screens */}
+        <div ref={searchRef} className="relative w-full sm:w-96 mx-4">
+
+          {/* Search Input */}
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={query}
+            onChange={handleSearch}
+            className="
+              w-full py-3 pl-12 pr-4 rounded-full 
+              border border-gray-300 
+              focus:outline-none focus:border-yellow-500
+              transition-all duration-200
+              shadow-md 
+              hover:shadow-lg 
+              bg-white
+            "
+          />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+
+          {/* Results Dropdown */}
+          {showResults && results.length > 0 && (
+            <div
+              className="
+                absolute top-14 w-full bg-white border border-gray-200 rounded-lg 
+                shadow-xl z-50 max-h-72 overflow-y-auto animate-fade-in
+              "
+            >
+              {results.map((user) => (
+                <div
+                  key={user._id}
+                  onClick={() => handleSelectUser(user._id)}
+                  className="
+                    flex items-center gap-3 p-3 
+                    hover:bg-gray-100 cursor-pointer 
+                    transition-all duration-150
+                  "
+                >
+                  {user.profilePic?.url ? (
+                    <img
+                      src={user.profilePic.url}
+                      className="w-9 h-9 rounded-full"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-yellow-600 text-white flex items-center justify-center font-bold">
+                      {user.username[0].toUpperCase()}
+                    </div>
+                  )}
+
+                  <div className="flex flex-col">
+                    <span className="text-gray-800 font-medium">
+                      @{user.username}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      {user.name}
+                    </span>
                   </div>
-                )}
-                <span className="text-gray-800 font-medium">@{user.username}</span>
-              </div>
-            ))}
-          </div>
-        )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Logout (Desktop) */}
+        <button
+          onClick={handleLogout}
+          className="hidden sm:flex items-center space-x-2 py-2 px-4 rounded-full bg-red-600 text-white hover:bg-red-700 transition"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Logout</span>
+        </button>
       </div>
 
-      {/* Logout Button */}
-      <button
-        onClick={handleLogout}
-        className="hidden sm:flex items-center space-x-2 py-2 px-4 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 transition"
-      >
-        <LogOut className="w-4 h-4" />
-        <span>Logout</span>
-      </button>
-
-      {/* Mobile Dropdown Menu */}
+      {/* Mobile Menu */}
       {showMobileMenu && (
-        <div className="absolute top-20 left-0 w-full bg-white shadow-lg border border-gray-200 rounded-b-xl p-4 sm:hidden z-50">
-
-          {/* Mobile Search */}
-          <div className="relative w-full mb-4">
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={query}
-              onChange={handleSearch}
-              className="w-full py-3 pl-12 pr-4 rounded-full border-2 border-yellow-400 bg-white"
-            />
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-
-            {showResults && results.length > 0 && (
-              <div className="absolute top-14 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-52 overflow-y-auto z-50">
-                {results.map((user) => (
-                  <div
-                    key={user._id}
-                    onClick={() => handleSelectUser(user._id)}
-                    className="flex items-center gap-3 p-2 hover:bg-gray-100 cursor-pointer"
-                  >
-                    {user.profilePic?.url ? (
-                      <img
-                        src={user.profilePic.url}
-                        className="w-8 h-8 rounded-full"
-                        alt={user.username}
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-yellow-600 text-white flex items-center justify-center font-bold">
-                        {user.username.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    <span>@{user.username}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="sm:hidden w-full bg-white shadow-lg border border-gray-200 rounded-lg p-4 mt-3">
 
           {/* Mobile Logout */}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 transition"
+            className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-full bg-red-600 text-white hover:bg-red-700 transition"
           >
             <LogOut className="w-4 h-4" />
-            <span>Logout</span>
+            Logout
           </button>
         </div>
       )}

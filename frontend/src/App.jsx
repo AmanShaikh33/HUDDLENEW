@@ -9,46 +9,51 @@ import Profile from "./components/Profile";
 import PrivateRoute from "./components/PrivateRoute";
 import PublicRoute from "./components/PublicRoute";
 import UserAccount from "./components/UserAccount";
+import BackendStatus from "./components/BackendStatus"; // ✅ ADDED
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Public Routes */}
-        <Route
-          path="/"
-          element={
-            <PublicRoute>
-              <HuddleLogin />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            <PublicRoute>
-              <HuddleSignup />
-            </PublicRoute>
-          }
-        />
+    <>
+      <BackendStatus />
 
-        {/* Private Routes */}
-        <Route
-          path="/homepage"
-          element={
-            <PrivateRoute>
-              <HomePage />
-            </PrivateRoute>
-          }
-        >
-          <Route index element={<Feed />} />
-          <Route path="feed" element={<Feed />} />
-          <Route path="notifications" element={<Notifications />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="user/:userId" element={<UserAccount />} /> 
-        </Route>
-      </Routes>
-    </Router>
+      <Router>
+        <Routes>
+    
+          <Route
+            path="/"
+            element={
+              <PublicRoute>
+                <HuddleLogin />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <PublicRoute>
+                <HuddleSignup />
+              </PublicRoute>
+            }
+          />
+
+         
+          <Route
+            path="/homepage"
+            element={
+              <PrivateRoute>
+                <HomePage />
+              </PrivateRoute>
+            }
+          >
+            <Route index element={<Feed />} />
+            <Route path="feed" element={<Feed />} />
+            <Route path="notifications" element={<Notifications />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="user/:userId" element={<UserAccount />} />
+          </Route>
+        </Routes>
+      </Router>
+    </>
   );
 }
 

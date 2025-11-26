@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   getNotifications,
-  markNotificationsRead,
   clearNotifications,
 } from "../../api/api";
 import { CheckCircle, Heart, MessageSquare, User } from "lucide-react";
@@ -48,7 +47,7 @@ const NotificationsPage = () => {
         Notifications
       </h2>
 
-      {/* Buttons Row */}
+      {/* Clear Button */}
       <div className="flex flex-wrap gap-2 mb-4 justify-center md:justify-start">
         <button
           onClick={handleClear}
@@ -65,31 +64,41 @@ const NotificationsPage = () => {
           {notifications.map((n) => (
             <div
               key={n._id}
+              onClick={() => {
+                // ⭐ FIXED: Works with HomePage event listener
+                window.dispatchEvent(
+                  new CustomEvent("openUserAccount", {
+                    detail: n.sender._id,
+                  })
+                );
+              }}
               className="
                 flex items-center 
                 p-4 bg-white rounded-xl shadow-md 
                 hover:shadow-lg transition-shadow duration-200
-                w-full
+                w-full cursor-pointer
               "
             >
-              {/* Profile */}
+              {/* Profile Image */}
               <div className="flex-shrink-0 mr-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-yellow-300 ring-2 ring-yellow-300">
                   <img
-                    src={n.sender.profilePic.url || "/default-avatar.png"}
+                    src={n.sender.profilePic?.url || '/default-avatar.png'}
                     alt={n.sender.username}
                     className="w-full h-full object-cover"
                   />
                 </div>
               </div>
 
-              {/* Text Content */}
+              {/* Notification Text */}
               <div className="flex-grow text-sm min-w-0">
                 <div className="flex items-center justify-between flex-wrap">
+
                   <div className="flex items-center min-w-0">
                     <span className="font-semibold text-gray-800 mr-1 truncate">
                       @{n.sender.username}
                     </span>
+
                     {n.sender.isVerified && (
                       <CheckCircle className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
                     )}
@@ -103,7 +112,7 @@ const NotificationsPage = () => {
                   </span>
                 </div>
 
-                {/* Notification Text */}
+                {/* Message */}
                 <p className="text-gray-600 mt-0.5 break-words">
                   {n.type === "like" && "liked your post"}
                   {n.type === "comment" && (
@@ -119,7 +128,9 @@ const NotificationsPage = () => {
               </div>
 
               {/* Icon */}
-              <div className="flex-shrink-0 ml-3">{getNotificationIcon(n.type)}</div>
+              <div className="flex-shrink-0 ml-3">
+                {getNotificationIcon(n.type)}
+              </div>
             </div>
           ))}
         </div>

@@ -25,7 +25,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
   const [likeLoading, setLikeLoading] = useState(false);
   const [Liked, setLiked] = useState(liked);
 
-  // Fetch post data
+  // Fetch post
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -40,7 +40,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
     if (postId) fetchPost();
   }, [postId]);
 
-  // Like/unlike handler
+  // Like handler
   const handleLike = async () => {
     if (!post) return;
     setLikeLoading(true);
@@ -61,7 +61,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
     }
   };
 
-  // Add comment handler
+  // Comment handler
   const handleCommentSubmit = async () => {
     if (!commentText.trim() || !post) return;
     setLoading(true);
@@ -91,11 +91,11 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
         onClick={onClose}
       />
 
-      {/* Modal */}
-      <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+      {/* Modal Wrapper */}
+      <div className="fixed inset-0 flex items-center justify-center z-50 p-4 overflow-y-auto">
         <div
           className="
-            w-full max-w-[720px] max-h-[90vh]
+            w-full max-w-[720px] max-h-[90vh] my-6
             bg-white rounded-3xl shadow-2xl
             flex flex-col 
             overflow-hidden
@@ -114,11 +114,11 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
             </button>
           </div>
 
-          {/* Main content */}
-          <div className="flex flex-col md:flex-row flex-1 min-h-0">
+          {/* Body */}
+          <div className="flex flex-col md:flex-row flex-1 overflow-y-auto">
 
-            {/* LEFT SIDE — HIDDEN ON MOBILE */}
-            <div className="hidden md:flex md:w-1/2 p-5 flex-col border-r border-gray-100">
+            {/* LEFT SIDE */}
+            <div className="w-full md:w-1/2 p-5 flex flex-col border-b md:border-b-0 md:border-r border-gray-100">
               <div className="flex items-center mb-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
                   {owner.profilePic ? (
@@ -137,7 +137,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
                 <div>
                   <div className="flex items-center text-sm font-semibold text-gray-800">
                     @{owner.username}
-                    <CheckCircle className="w-4 h-4 ml-1 text-yellow-500 fill-yellow-500" />
+                    <CheckCircle className="w-4 h-4 ml-1 text-yellow-500" />
                   </div>
                   <div className="text-xs text-gray-500">{timeAgo(createdAt)}</div>
                 </div>
@@ -145,23 +145,24 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
 
               {/* Media */}
               <div className="w-full h-72 bg-gray-200 rounded-lg overflow-hidden mb-3">
-                {files?.length > 0 &&
-                files[0].type === "image" ? (
+                {files?.length > 0 && files[0].type === "image" ? (
                   <img
                     src={files[0].url}
-                    alt="Post content"
+                    alt="Post"
                     className="w-full h-full object-cover"
                   />
-                ) : files?.length > 0 ? (
-                  <video
-                    src={files[0].url}
-                    controls
-                    className="w-full h-full object-cover"
-                  />
-                ) : null}
+                ) : (
+                  files?.length > 0 && (
+                    <video
+                      src={files[0].url}
+                      controls
+                      className="w-full h-full object-cover"
+                    />
+                  )
+                )}
               </div>
 
-              {/* Likes / Comments */}
+              {/* Like / Comments */}
               <div className="flex items-center justify-start space-x-6 text-gray-600">
                 <button
                   onClick={onToggleLike}
@@ -175,7 +176,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
                 </button>
 
                 <div className="flex items-center font-medium text-sm">
-                  <MessageSquare className="w-5 h-5 mr-2 text-purple-600 fill-purple-600" />
+                  <MessageSquare className="w-5 h-5 mr-2 text-purple-600" />
                   <span>{comments.length} Comments</span>
                 </div>
               </div>
@@ -184,8 +185,8 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
               <p className="mt-2 text-sm text-gray-700">{caption}</p>
             </div>
 
-            {/* RIGHT SIDE — COMMENTS (FULL WIDTH ON MOBILE) */}
-            <div className="w-full md:w-1/2 p-5 flex flex-col flex-1 overflow-y-auto space-y-2">
+            {/* RIGHT SIDE */}
+            <div className="w-full md:w-1/2 p-5 flex flex-col flex-1 space-y-2">
               {comments.length > 0 ? (
                 comments.map((c, i) => {
                   const userObj =
@@ -205,13 +206,13 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
                           />
                         ) : (
                           <div className="w-8 h-8 rounded-full bg-gray-500 text-white flex items-center justify-center font-bold">
-                            {userObj.username.charAt(0).toUpperCase()}
+                            {userObj.username?.charAt(0).toUpperCase()}
                           </div>
                         )}
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center text-xs text-gray-500 mb-0.5">
+                        <div className="text-xs text-gray-500 mb-0.5">
                           <span className="font-semibold text-gray-800 mr-1">
                             {userObj.username}
                           </span>
@@ -251,14 +252,22 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
               placeholder="Write a comment..."
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
-              className="flex-1 py-3 px-4 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-200 bg-gray-50 text-gray-700 placeholder-gray-500"
+              className="flex-1 py-3 px-4 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-200 bg-gray-50 text-gray-700"
             />
+
             <button
               onClick={handleCommentSubmit}
               disabled={loading}
               className="py-3 px-6 rounded-full bg-purple-600 text-white font-semibold shadow-md hover:bg-purple-700 transition-colors flex-shrink-0"
             >
-              {loading ? "Posting..." : "Post Comment"}
+              {loading ? (
+                "Posting..."
+              ) : (
+                <>
+                  <span className="hidden sm:inline">Post Comment</span>
+                  <span className="sm:hidden">Post</span>
+                </>
+              )}
             </button>
           </div>
         </div>

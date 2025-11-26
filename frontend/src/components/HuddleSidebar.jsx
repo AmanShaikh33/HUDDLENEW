@@ -24,7 +24,6 @@ const HuddleSidebar = ({
   const [showEditModal, setShowEditModal] = useState(false);
   const socketRef = useRef(null);
 
-  // Fetch logged-in user
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -37,7 +36,6 @@ const HuddleSidebar = ({
     fetchUser();
   }, []);
 
-  // Fetch unread + setup Socket.IO
   useEffect(() => {
     if (!user) return;
 
@@ -92,11 +90,10 @@ const HuddleSidebar = ({
 
   return (
     <>
-      {/* ======================== DESKTOP SIDEBAR ======================== */}
+      {/* DESKTOP SIDEBAR */}
       <div className="hidden md:flex w-64 p-4 flex-col justify-between h-full bg-white border-r border-gray-100">
-
         <nav className="space-y-2">
-
+          
           {/* HOME */}
           <button
             onClick={() => window.location.href = "/homepage"}
@@ -139,19 +136,6 @@ const HuddleSidebar = ({
             )}
           </button>
 
-          {/* NOTES */}
-          <button
-            onClick={onShowNotes}
-            className={`flex w-full items-center p-3 rounded-xl transition ${
-              activeItem === "Notes"
-                ? "bg-purple-100 text-purple-700 font-semibold"
-                : "text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            <StickyNote className="w-5 h-5 mr-3" />
-            Notes
-          </button>
-
           {/* PROFILE */}
           <button
             onClick={onShowProfile}
@@ -192,61 +176,36 @@ const HuddleSidebar = ({
         </div>
       </div>
 
-      {/* ======================== MOBILE BOTTOM NAV ======================== */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-300 shadow-lg z-50">
+      {/* MOBILE BOTTOM NAV */}
+      <div className="mobile-bottom-nav md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-300 shadow-lg z-50">
         <div className="flex justify-around py-3">
-
-          {/* HOME */}
+          
           <button onClick={() => window.location.href="/homepage"} className="flex flex-col items-center">
-            <Home
-              className={`w-6 h-6 ${
-                activeItem === "Home" ? "text-purple-600" : "text-gray-600"
-              }`}
-            />
+            <Home className={`w-6 h-6 ${activeItem === "Home" ? "text-purple-600" : "text-gray-600"}`} />
           </button>
 
-          {/* MESSAGES */}
           <button onClick={handleMessagesClick} className="relative flex flex-col items-center">
-            <MessageSquare
-              className={`w-6 h-6 ${
-                activeItem === "Messages" ? "text-purple-600" : "text-gray-600"
-              }`}
-            />
+            <MessageSquare className={`w-6 h-6 ${activeItem === "Messages" ? "text-purple-600" : "text-gray-600"}`} />
             {hasUnread && (
               <span className="absolute top-0 right-3 w-2 h-2 bg-purple-600 rounded-full" />
             )}
           </button>
 
-          {/* NOTES */}
+          {/* NOTES – MOBILE ONLY */}
           <button onClick={onShowNotes} className="flex flex-col items-center">
-            <StickyNote
-              className={`w-6 h-6 ${
-                activeItem === "Notes" ? "text-purple-600" : "text-gray-600"
-              }`}
-            />
+            <StickyNote className={`w-6 h-6 ${activeItem === "Notes" ? "text-purple-600" : "text-gray-600"}`} />
           </button>
 
-          {/* NOTIFICATIONS */}
           <button onClick={onShowNotifications} className="flex flex-col items-center">
-            <Bell
-              className={`w-6 h-6 ${
-                activeItem === "Notifications" ? "text-purple-600" : "text-gray-600"
-              }`}
-            />
+            <Bell className={`w-6 h-6 ${activeItem === "Notifications" ? "text-purple-600" : "text-gray-600"}`} />
           </button>
 
-          {/* PROFILE */}
           <button onClick={onShowProfile} className="flex flex-col items-center">
-            <User
-              className={`w-6 h-6 ${
-                activeItem === "Profile" ? "text-purple-600" : "text-gray-600"
-              }`}
-            />
+            <User className={`w-6 h-6 ${activeItem === "Profile" ? "text-purple-600" : "text-gray-600"}`} />
           </button>
         </div>
       </div>
 
-      {/* EDIT PROFILE MODAL */}
       {showEditModal && (
         <EditProfileModal
           onClose={() => setShowEditModal(false)}

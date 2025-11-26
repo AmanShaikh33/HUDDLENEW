@@ -15,18 +15,18 @@ export const setupSocket = (server) => {
   // Store online users (userId -> socketId)
   const onlineUsers = new Map();
 
-  // ✅ Middleware to parse cookie and authenticate JWT
+  // AUTH MIDDLEWARE
   io.use((socket, next) => {
     try {
-      const cookies = socket.handshake.headers.cookie; // get cookies
+      const cookies = socket.handshake.headers.cookie;
       if (!cookies) return next(new Error("No cookie found"));
 
-      const parsed = cookie.parse(cookies); // parse cookies
-      const token = parsed.token; // get token
+      const parsed = cookie.parse(cookies);
+      const token = parsed.token;
       if (!token) return next(new Error("Unauthorized"));
 
       const decoded = jwt.verify(token, process.env.JWT_SEC);
-      socket.userId = decoded.id; // attach userId to socket
+      socket.userId = decoded.id;
       next();
     } catch (err) {
       console.log("Socket auth error:", err.message);
@@ -35,17 +35,33 @@ export const setupSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
-    console.log(`User connected: ${socket.id}`);
+    console.log(`User connected: ${socket.userId}`);
+
+    // register user as online
     onlineUsers.set(socket.userId, socket.id);
 
-    // Join a private chat room
+    // broadcast online status
+    io.emit("userOnline", socket.userId);
+
+    // JOIN PRIVATE CHAT ROOM
     socket.on("joinChat", ({ otherUserId }) => {
       const room = [socket.userId, otherUserId].sort().join("-");
       socket.join(room);
       console.log(`User ${socket.userId} joined room: ${room}`);
+
+      // mark messages as seen when chat opened
+      Message.updateMany(
+        { sender: otherUserId, receiver: socket.userId, seen: false },
+        { seen: true }
+      ).then(() => {
+        const senderSocket = onlineUsers.get(otherUserId);
+        if (senderSocket) {
+          io.to(senderSocket).emit("seenUpdate", socket.userId);
+        }
+      });
     });
 
-    // Handle sending a message
+    // SEND MESSAGE
     socket.on("sendMessage", async ({ receiverId, content }) => {
       if (!receiverId || !content) return;
 
@@ -70,8 +86,39 @@ export const setupSocket = (server) => {
       }
     });
 
+    // TYPING INDICATOR
+    socket.on("typing", ({ receiverId }) => {
+      const receiverSocket = onlineUsers.get(receiverId);
+      if (receiverSocket) {
+        io.to(receiverSocket).emit("typing", socket.userId);
+      }
+    });
+
+    // STOP TYPING
+    socket.on("stopTyping", ({ receiverId }) => {
+      const receiverSocket = onlineUsers.get(receiverId);
+      if (receiverSocket) {
+        io.to(receiverSocket).emit("stopTyping", socket.userId);
+      }
+    });
+
+    // MARK MESSAGE SEEN (Instagram style)
+    socket.on("messageSeen", ({ senderId }) => {
+      Message.updateMany(
+        { sender: senderId, receiver: socket.userId, seen: false },
+        { seen: true }
+      ).then(() => {
+        const senderSocket = onlineUsers.get(senderId);
+        if (senderSocket) {
+          io.to(senderSocket).emit("seenUpdate", socket.userId);
+        }
+      });
+    });
+
+    // DISCONNECT
     socket.on("disconnect", () => {
       onlineUsers.delete(socket.userId);
+      io.emit("userOffline", socket.userId);
       console.log(`User ${socket.userId} disconnected`);
     });
   });

@@ -27,7 +27,6 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
   const [newCaption, setNewCaption] = useState("");
   const menuRef = useRef(null);
 
-  // Fetch post
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -44,7 +43,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
     fetchPost();
   }, [postId]);
 
-  // Close menu when clicked outside
+  // Close menu on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -75,7 +74,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
         };
       });
 
-      setLiked((prevLiked) => !prevLiked);
+      setLiked((prev) => !prev);
     } catch (err) {
       console.error(err.message);
     } finally {
@@ -92,15 +91,13 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
     try {
       await deletePost(post._id);
 
-      if (onDeleteSuccess) {
-        onDeleteSuccess(post._id);
-      }
-
+      if (onDeleteSuccess) onDeleteSuccess(post._id);
       alert("Post deleted successfully!");
     } catch (err) {
       console.error(err.message);
       alert("Failed to delete post.");
     }
+
     setIsMenuOpen(false);
   };
 
@@ -111,20 +108,16 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
     }
 
     try {
-      const updatedPostResponse = await editPostCaption(
-        post._id,
-        newCaption
-      );
-      const updatedPost = updatedPostResponse.post || updatedPostResponse;
+      const updated = await editPostCaption(post._id, newCaption);
+      const updatedPost = updated.post || updated;
 
       setPost((prev) => ({ ...prev, caption: updatedPost.caption }));
 
-      if (onEditSuccess) {
+      if (onEditSuccess)
         onEditSuccess(post._id, updatedPost.caption);
-      }
+
     } catch (err) {
       console.error(err.message);
-      alert("Failed to update caption.");
       setNewCaption(post.caption);
     } finally {
       setIsEditing(false);
@@ -135,26 +128,18 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
   if (!post || !currentUserId) return null;
 
   const { owner, caption, files } = post;
-  const isOwner = currentUserId === owner._id;
 
   return (
     <>
+      {/* POST CARD */}
       <div
-        className="
-            w-full 
-    bg-white 
-    p-3 sm:p-4 
-    rounded-3xl 
-    shadow-xl 
-    hover:shadow-2xl 
-    transition-all 
-    relative 
-    max-w-full 
-    mx-auto
-        "
-        onClick={() => setIsModalOpen(true)}
+        className="w-full bg-white p-3 sm:p-4 rounded-3xl shadow-xl hover:shadow-2xl transition-all relative max-w-full mx-auto"
+        onClick={() => {
+          document.body.classList.add("comments-open");
+          setIsModalOpen(true);
+        }}
       >
-        {/* Header */}
+        {/* HEADER */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center">
             <div className="w-10 h-10 bg-gray-300 rounded-full mr-3 overflow-hidden flex items-center justify-center text-white font-bold text-lg">
@@ -174,15 +159,14 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
                 {owner.username}
                 <CheckCircle className="w-4 h-4 ml-1 text-yellow-500" />
               </div>
-
               <div className="text-xs text-gray-500">
                 @{owner.email.split("@")[0]}
               </div>
             </div>
           </div>
 
-          {/* Menu */}
-          {isOwner && (
+          {/* MENU */}
+          {currentUserId === owner._id && (
             <div className="relative" ref={menuRef}>
               <button
                 className="p-1 rounded-full text-gray-500 hover:bg-gray-100"
@@ -223,13 +207,10 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
           )}
         </div>
 
-        {/* Caption */}
+        {/* CAPTION */}
         <div className="mb-4 text-gray-700">
           {isEditing ? (
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="mb-2"
-            >
+            <div onClick={(e) => e.stopPropagation()}>
               <textarea
                 value={newCaption}
                 onChange={(e) => setNewCaption(e.target.value)}
@@ -270,26 +251,18 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
           )}
         </div>
 
-        {/* Media */}
+        {/* MEDIA */}
         {files?.length > 0 && (
           <div className="w-full bg-gray-100 rounded-lg mb-4 overflow-hidden">
             {files[0].type === "image" ? (
-              <img
-                src={files[0].url}
-                alt="post media"
-                className="w-full h-auto object-cover"
-              />
+              <img src={files[0].url} alt="post" className="w-full object-cover" />
             ) : (
-              <video
-                src={files[0].url}
-                controls
-                className="w-full h-auto object-cover"
-              />
+              <video src={files[0].url} controls className="w-full"></video>
             )}
           </div>
         )}
 
-        {/* Actions */}
+        {/* ACTIONS */}
         <div className="flex flex-wrap justify-center items-center gap-3 mb-2">
           <button
             onClick={(e) => {
@@ -303,13 +276,14 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
                 : "bg-purple-100 text-purple-600 hover:bg-purple-200"
             }`}
           >
-            <Heart className="w-4 h-4 fill-current" />
+            <Heart className="w-4 h-4" />
             <span>{loadingLike ? "..." : "Like"}</span>
           </button>
 
           <button
             onClick={(e) => {
               e.stopPropagation();
+              document.body.classList.add("comments-open");
               setIsModalOpen(true);
             }}
             className="flex items-center space-x-1 px-4 py-2 rounded-full bg-purple-100 text-purple-600 hover:bg-purple-200"
@@ -320,13 +294,16 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* MODAL */}
       {isModalOpen && (
         <CommentsModal
           postId={post._id}
           liked={liked}
           onToggleLike={handleLike}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            document.body.classList.remove("comments-open");
+            setIsModalOpen(false);
+          }}
         />
       )}
     </>
