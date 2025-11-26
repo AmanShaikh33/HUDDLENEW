@@ -25,7 +25,7 @@ export default function BackendStatus() {
         // Backend not ready (sleeping), retry later
       }
 
-      // Retry every 3 seconds until backend wakes up
+      
       setTimeout(checkBackend, 3000);
     };
 
@@ -35,12 +35,12 @@ export default function BackendStatus() {
   if (!backendReady) {
     return (
       <div className="flex items-center justify-center h-screen flex-col text-center gap-2">
-        <div className="animate-spin h-10 w-10 border-4 border-gray-300 border-t-black rounded-full"></div>
+        <div className="animate-spin h-10 w-10 border-4 border-gray-400 border-t-black rounded-full"></div>
         <p className="text-lg font-semibold">
           Backend is starting…  
           <br />
           Please wait 20–30 seconds.
-          render time leta he bhai 
+          render time leta he bhai wait kro
         </p>
       </div>
     );
