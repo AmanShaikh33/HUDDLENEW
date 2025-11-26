@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 export default function BackendStatus() {
   const [backendReady, setBackendReady] = useState(false);
 
-  const backendURL = "https://your-render-backend.onrender.com/health";
+  const backendURL = "https://huddlenew-1.onrender.com/health";
 
   useEffect(() => {
     const checkBackend = async () => {
@@ -40,6 +40,7 @@ export default function BackendStatus() {
           Backend is starting…  
           <br />
           Please wait 20–30 seconds.
+          render time leta he bhai 
         </p>
       </div>
     );
