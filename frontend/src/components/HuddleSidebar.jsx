@@ -176,7 +176,7 @@ const HuddleSidebar = ({
         </div>
       </div>
 
-      {/* MOBILE BOTTOM NAV */}
+      
       <div className="mobile-bottom-nav md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-300 shadow-lg z-50">
         <div className="flex justify-around py-3">
           
@@ -191,7 +191,7 @@ const HuddleSidebar = ({
             )}
           </button>
 
-          {/* NOTES – MOBILE ONLY */}
+     
           <button onClick={onShowNotes} className="flex flex-col items-center">
             <StickyNote className={`w-6 h-6 ${activeItem === "Notes" ? "text-purple-600" : "text-gray-600"}`} />
           </button>

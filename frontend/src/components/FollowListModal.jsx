@@ -11,7 +11,7 @@ const FollowListModal = ({ userId, type, onClose }) => {
       try {
         setLoading(true);
         const data = await getFollowersOrFollowings(userId, type);
-        // Ensure data.list or data.users is an array
+        
         const usersArray = Array.isArray(data.list)
           ? data.list
           : Array.isArray(data.users)

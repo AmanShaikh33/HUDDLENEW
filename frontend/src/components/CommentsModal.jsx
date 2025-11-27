@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Heart, MessageSquare, CheckCircle, X } from "lucide-react";
 import { getPostById, commentOnPost, likeUnlikePost } from "../../api/api";
 
-// Helper function to format time
 const timeAgo = (dateString) => {
   if (!dateString) return "";
   const now = new Date();
@@ -25,7 +24,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
   const [likeLoading, setLikeLoading] = useState(false);
   const [Liked, setLiked] = useState(liked);
 
-  // Fetch post
+  
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -40,7 +39,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
     if (postId) fetchPost();
   }, [postId]);
 
-  // Like handler
+  
   const handleLike = async () => {
     if (!post) return;
     setLikeLoading(true);
@@ -61,7 +60,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
     }
   };
 
-  // Comment handler
+  
   const handleCommentSubmit = async () => {
     if (!commentText.trim() || !post) return;
     setLoading(true);
@@ -85,13 +84,13 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
 
   return (
     <>
-      {/* Overlay */}
+   
       <div
         className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-40"
         onClick={onClose}
       />
 
-      {/* Modal Wrapper */}
+    
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4 overflow-y-auto">
         <div
           className="
@@ -101,7 +100,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
             overflow-hidden
           "
         >
-          {/* Header */}
+         
           <div className="p-5 border-b border-gray-100 flex justify-between items-center flex-shrink-0 relative">
             <span className="text-xl font-bold text-gray-800 w-full text-center">
               POST
@@ -114,10 +113,10 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
             </button>
           </div>
 
-          {/* Body */}
+          
           <div className="flex flex-col md:flex-row flex-1 overflow-y-auto">
 
-            {/* LEFT SIDE */}
+         
             <div className="w-full md:w-1/2 p-5 flex flex-col border-b md:border-b-0 md:border-r border-gray-100">
               <div className="flex items-center mb-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
@@ -143,7 +142,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
                 </div>
               </div>
 
-              {/* Media */}
+             
               <div className="w-full h-72 bg-gray-200 rounded-lg overflow-hidden mb-3">
                 {files?.length > 0 && files[0].type === "image" ? (
                   <img
@@ -162,7 +161,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
                 )}
               </div>
 
-              {/* Like / Comments */}
+              
               <div className="flex items-center justify-start space-x-6 text-gray-600">
                 <button
                   onClick={onToggleLike}
@@ -181,11 +180,11 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
                 </div>
               </div>
 
-              {/* Caption */}
+              
               <p className="mt-2 text-sm text-gray-700">{caption}</p>
             </div>
 
-            {/* RIGHT SIDE */}
+         
             <div className="w-full md:w-1/2 p-5 flex flex-col flex-1 space-y-2">
               {comments.length > 0 ? (
                 comments.map((c, i) => {
@@ -245,7 +244,7 @@ const CommentsModal = ({ postId, onClose = () => {}, liked, onToggleLike }) => {
             </div>
           </div>
 
-          {/* Comment Input */}
+          
           <div className="p-5 border-t border-gray-100 flex items-center space-x-3 flex-shrink-0">
             <input
               type="text"

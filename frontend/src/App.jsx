@@ -1,4 +1,4 @@
-// App.jsx
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import HuddleLogin from "./pages/HuddleLogin";
@@ -9,7 +9,7 @@ import Profile from "./components/Profile";
 import PrivateRoute from "./components/PrivateRoute";
 import PublicRoute from "./components/PublicRoute";
 import UserAccount from "./components/UserAccount";
-import BackendStatus from "./components/BackendStatus"; // ✅ ADDED
+import BackendStatus from "./components/BackendStatus"; 
 
 function App() {
   return (

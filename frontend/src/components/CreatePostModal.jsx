@@ -64,7 +64,7 @@ const CreatePostModal = ({ onClose }) => {
           <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800">✕</button>
           <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Create Post</h2>
 
-          {/* User Info */}
+        
           <div className="flex items-center mb-6">
             <div className="w-12 h-12 rounded-full overflow-hidden mr-3 bg-gray-300 flex items-center justify-center text-white font-bold text-lg">
               {user.username.charAt(0).toUpperCase()}
@@ -78,7 +78,6 @@ const CreatePostModal = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Caption input */}
           <div className="mb-4">
             <input
               type="text"
@@ -89,7 +88,7 @@ const CreatePostModal = ({ onClose }) => {
             />
           </div>
 
-          {/* Preview */}
+        
           {preview && (
             <div className="mb-4 flex justify-center">
               {file.type.startsWith('image') ? (
@@ -108,7 +107,7 @@ const CreatePostModal = ({ onClose }) => {
             </div>
           )}
 
-          {/* Action Icons */}
+          
           <div className="flex justify-center space-x-6 text-gray-600 mb-6">
             <label className="p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer">
               <Camera className="w-6 h-6" />
@@ -122,7 +121,7 @@ const CreatePostModal = ({ onClose }) => {
             <button className="p-2 rounded-full hover:bg-gray-100 transition-colors"><Smile className="w-6 h-6" /></button>
           </div>
 
-          {/* Bottom Buttons */}
+          
           <div className="flex justify-between space-x-4">
             <button onClick={onClose} className="flex-1 py-3 rounded-full border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">Cancel</button>
             <button onClick={handlePost} disabled={loading} className={`flex-1 py-3 rounded-full bg-purple-600 text-white font-semibold shadow-md transition-colors ${loading ? 'bg-purple-400' : 'hover:bg-purple-700'}`}>

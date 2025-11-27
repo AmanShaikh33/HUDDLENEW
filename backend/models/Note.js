@@ -1,4 +1,4 @@
-// models/Note.js
+
 import mongoose from "mongoose";
 
 const noteSchema = new mongoose.Schema({
@@ -8,7 +8,6 @@ const noteSchema = new mongoose.Schema({
   expiresAt: { type: Date, required: true },
 });
 
-// TTL index to auto-delete expired notes
 noteSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export const Note = mongoose.model("Note", noteSchema);

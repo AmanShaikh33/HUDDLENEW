@@ -70,10 +70,10 @@ const UserAccount = ({ userId }) => {
   return (
     <div className="p-4 md:p-6 bg-white rounded-xl h-full overflow-y-auto scrollbar-hide">
 
-      {/* Profile Header */}
+      
       <div className="flex items-start mb-6 flex-col sm:flex-row sm:items-center">
 
-        {/* Avatar */}
+        
         <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full p-[2px] bg-yellow-500 mr-0 sm:mr-4 mb-4 sm:mb-0 flex items-center justify-center">
           <div className="w-full h-full rounded-full p-1 bg-white flex items-center justify-center">
             <img
@@ -84,10 +84,10 @@ const UserAccount = ({ userId }) => {
           </div>
         </div>
 
-        {/* Username + Bio + Follow */}
+    
         <div className="flex-1 w-full">
 
-          {/* Username + Follow Button */}
+        
           <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full mb-2 gap-2">
             
             <div className="flex items-center text-xl sm:text-2xl font-bold text-gray-800">
@@ -107,7 +107,7 @@ const UserAccount = ({ userId }) => {
             </button>
           </div>
 
-          {/* Bio */}
+         
           <p className="text-sm text-gray-600 break-words">
             {user.bio || "No bio yet."}
           </p>
@@ -115,7 +115,7 @@ const UserAccount = ({ userId }) => {
         </div>
       </div>
 
-      {/* Stats Bar */}
+     
       <div className="flex justify-between sm:justify-center py-4 sm:py-6 gap-4 sm:gap-12">
         {[
           { label: "Posts", value: posts.length },
@@ -138,7 +138,7 @@ const UserAccount = ({ userId }) => {
         ))}
       </div>
 
-      {/* Posts Section */}
+      
       <div className="mt-6">
         <h2 className="text-lg font-semibold mb-4">
           {user.username}'s Posts

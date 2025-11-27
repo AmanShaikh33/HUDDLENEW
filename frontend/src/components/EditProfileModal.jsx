@@ -23,7 +23,7 @@ const EditProfileModal = ({ onClose = () => {}, currentUser, setUser }) => {
     }
   };
 
-  // Submit updated profile
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -36,7 +36,7 @@ const EditProfileModal = ({ onClose = () => {}, currentUser, setUser }) => {
       const res = await updateProfile(fd, currentUser._id);
       console.log('✅ Profile updated successfully:', res);
 
-      if (res.user) setUser(res.user); // update parent state with new user
+      if (res.user) setUser(res.user); 
       onClose();
     } catch (error) {
       console.error('❌ Error updating profile:', error?.message || error);

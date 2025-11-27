@@ -19,18 +19,17 @@ export const registerUser = TryCatch(async (req, res) => {
   const existingUsername = await User.findOne({ username });
   if (existingUsername) return res.status(400).json({ message: "Username already exists" });
 
-  // ✅ Use default profile pic (no upload yet)
   const myCloud = {
     public_id: "default_profile",
     secure_url: "https://res.cloudinary.com/demo/image/upload/v1699999999/default-profile.png",
   };
 
-  // Hash password
+  
   const hashPassword = await bcrypt.hash(password, 10);
 
-  // Create new user
+
   const user = await User.create({
-    name: username, // using username as name placeholder
+    name: username, 
     email,
     password: hashPassword,
     gender,
@@ -52,7 +51,6 @@ export const registerUser = TryCatch(async (req, res) => {
 });
 
 
-// ---------------- LOGIN USER ----------------
 export const loginUser = TryCatch(async (req, res) => {
   const { email, password } = req.body;
 
@@ -81,7 +79,7 @@ export const loginUser = TryCatch(async (req, res) => {
 
 
 
-// ---------------- LOGOUT USER ----------------
+
 export const logoutUser = TryCatch((req, res) => {
   res.cookie("token", "", { maxAge: 0 });
   res.json({ message: "Logged out successfully" });

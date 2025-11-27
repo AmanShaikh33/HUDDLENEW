@@ -13,7 +13,7 @@ const postSchema = new mongoose.Schema({
     },
   ],
 
-  files: [ // supports multiple images/videos
+  files: [
     {
       id: String,
       url: String,

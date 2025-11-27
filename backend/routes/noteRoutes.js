@@ -1,11 +1,11 @@
-// routes/noteRoutes.js
+
 import express from "express";
 import { isAuth } from "../middlewares/isAuth.js";
 import { Note } from "../models/Note.js";
 
 const router = express.Router();
 
-// Create a note
+
 router.post("/", isAuth, async (req, res) => {
   try {
     const { content } = req.body;
@@ -24,7 +24,7 @@ router.post("/", isAuth, async (req, res) => {
   }
 });
 
-// Fetch all active notes
+
 router.get("/", isAuth, async (req, res) => {
   try {
     const notes = await Note.find({ expiresAt: { $gt: new Date() } })
@@ -37,17 +37,17 @@ router.get("/", isAuth, async (req, res) => {
   }
 });
 
-// DELETE /notes/:id
+
 router.delete("/:id", isAuth, async (req, res) => {
   try {
     const note = await Note.findById(req.params.id);
     if (!note) return res.status(404).json({ message: "Note not found" });
 
-    // Only allow owner to delete
+    
     if (note.user.toString() !== req.user._id.toString())
       return res.status(403).json({ message: "Not authorized" });
 
-    // Use deleteOne instead of remove()
+   
     await note.deleteOne();
 
     res.json({ message: "Note deleted successfully" });

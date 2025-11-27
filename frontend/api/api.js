@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, // backend base URL
-  withCredentials: true, // allows sending cookies for JWT
+  baseURL: import.meta.env.VITE_API_URL, 
+  withCredentials: true, 
 });
 
-// ---------------- AUTH ROUTES ----------------
+
 export const registerUser = async (formData) => {
   try {
     const res = await API.post("/auth/register", formData, {
@@ -20,7 +20,7 @@ export const registerUser = async (formData) => {
 export const loginUser = async (credentials) => {
   try {
     const res = await API.post("/auth/login", credentials, {
-      withCredentials: true, // 🔥 cookie-based JWT fix
+      withCredentials: true, 
     });
     return res.data;
   } catch (error) {
@@ -37,7 +37,7 @@ export const logoutUser = async () => {
   }
 };
 
-// ---------------- POST ROUTES ----------------
+
 export const createPost = async (formData, type = "post") => {
   try {
     const res = await API.post(`/post/new?type=${type}`, formData, {
@@ -103,20 +103,18 @@ export const deleteComment = async (postId, commentId) => {
   }
 };
 
-// ---------------- USER ROUTES ----------------
 
-// Get logged-in user profile
 export const getMyProfile = async () => {
   try {
     const { data } = await API.get("/user/me");
-    return data; // Return full user data
+    return data; 
   } catch (error) {
     console.error("getMyProfile error:", error.response?.data || error.message);
     throw error.response?.data || { message: "Failed to fetch profile" };
   }
 };
 
-// Get another user's profile
+
 export const getUserProfile = async (userId) => {
   try {
     const res = await API.get(`/user/${userId}`);
@@ -126,7 +124,7 @@ export const getUserProfile = async (userId) => {
   }
 };
 
-// Follow / Unfollow user
+
 export const followUnfollowUser = async (userId) => {
   try {
     const res = await API.post(`/user/follow/${userId}`);
@@ -136,7 +134,7 @@ export const followUnfollowUser = async (userId) => {
   }
 };
 
-// Get followers / followings with pagination
+
 export const getFollowersOrFollowings = async (userId, type, page = 1, limit = 20) => {
   try {
     const res = await API.get(`/user/connections/${userId}`, {
@@ -148,8 +146,7 @@ export const getFollowersOrFollowings = async (userId, type, page = 1, limit = 2
   }
 };
 
-// Update logged-in user's profile
-// api.js
+
 export const updateProfile = async (formData, userId) => {
   if (!userId) throw new Error("User ID is required for updating profile");
 
@@ -160,7 +157,6 @@ export const updateProfile = async (formData, userId) => {
 };
 
 
-// Update logged-in user's password
 export const updatePassword = async (oldPassword, newPassword) => {
   try {
     const res = await API.post("/user/update-password", { oldPassword, newPassword });
@@ -170,7 +166,7 @@ export const updatePassword = async (oldPassword, newPassword) => {
   }
 };
 
-// Get a single post by ID
+
 export const getPostById = async (postId) => {
   try {
     const res = await API.get(`/post/${postId}`);
@@ -180,29 +176,26 @@ export const getPostById = async (postId) => {
   }
 };
 
-// 🔍 Search users
+
 export const searchUsers = async (query) => {
   try {
     const res = await API.get(`/user/all?search=${encodeURIComponent(query)}`);
-    return res.data; // returns an array of matched users
+    return res.data; 
   } catch (error) {
     throw error.response?.data || { message: "Failed to fetch users" };
   }
 };
 
-// ---------------- NOTIFICATION ROUTES ----------------
 
-// Fetch all notifications for logged-in user
 export const getNotifications = async () => {
   try {
     const res = await API.get("/notifications");
-    return res.data.notifications; // array of notifications
+    return res.data.notifications; 
   } catch (error) {
     throw error.response?.data || { message: "Failed to fetch notifications" };
   }
 };
 
-// Mark all notifications as read
 export const markNotificationsRead = async () => {
   try {
     const res = await API.put("/notifications/mark-read");
@@ -212,7 +205,6 @@ export const markNotificationsRead = async () => {
   }
 };
 
-// Clear (delete) all notifications
 export const clearNotifications = async () => {
   try {
     const res = await API.delete("/notifications/clear");
@@ -222,7 +214,7 @@ export const clearNotifications = async () => {
   }
 };
 
-// ---------------- CHAT ROUTES ----------------
+
 export const getAllUsers = async (search = "") => {
   try {
     const { data } = await API.get(`/user/all?search=${encodeURIComponent(search)}`);
@@ -234,22 +226,18 @@ export const getAllUsers = async (search = "") => {
 };
 
 
-// Send a message
-// New: Fetch chat history with a user
 
-// In api.js, use API instance with backend baseURL
 export const getChatHistory = async (userId) => {
   try {
     const response = await API.get(`/messages/history/${userId}`);
-    return response.data.messages || []; // always return array
+    return response.data.messages || []; 
   } catch (error) {
     console.error("Error fetching chat history:", error);
-    return []; // fallback to empty array
+    return []; 
   }
 };
 
-// New: Send message via API (backup, real-time via Socket.IO)
-// api.js
+
 export const sendMessageAPI = async (receiverId, content) => {
   try {
     const response = await API.post("/messages/send", { receiverId, content });
@@ -260,7 +248,7 @@ export const sendMessageAPI = async (receiverId, content) => {
   }
 };
 
-// New: Mark messages as read
+
 export const markMessagesAsRead = async (userId) => {
   try {
     const response = await API.put(`/messages/read/${userId}`);
@@ -271,45 +259,42 @@ export const markMessagesAsRead = async (userId) => {
   }
 };
 
-// Get unread counts
+
 export const getUnreadCounts = async () => {
   try {
     const res = await API.get("/messages/unread-count");
-    return res.data; // [{ userId, count }]
+    return res.data; 
   } catch (err) {
     console.error("Failed to fetch unread counts:", err);
     return [];
   }
 };
 
-// ---------------- NOTE ROUTES ----------------
 
-// Create a new note
 export const createNote = async (content) => {
   try {
     const res = await API.post("/notes", { content });
-    return res.data; // returns the created note
+    return res.data; 
   } catch (error) {
     throw error.response?.data || { message: "Failed to create note" };
   }
 };
 
-// Fetch all active notes
 export const getActiveNotes = async () => {
   try {
     const res = await API.get("/notes");
-    return res.data; // returns array of notes with user info
+    return res.data; 
   } catch (error) {
     throw error.response?.data || { message: "Failed to fetch notes" };
   }
 };
 
-// Delete a note
-// Delete a note
+
 export const deleteNote = async (noteId) => {
   try {
     const res = await API.delete(`/notes/${noteId}`);
-    return res.data; // { message: "Note deleted successfully" }
+    return res.data; 
+    
   } catch (error) {
     throw error.response?.data || { message: "Failed to delete note" };
   }

@@ -17,7 +17,7 @@ const HuddleSidebar = ({ onCreatePost, onShowProfile, onShowMessages }) => {
   const [hasUnread, setHasUnread] = useState(false);
   const socketRef = useRef(null);
 
-  // Fetch logged-in user
+  
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -30,13 +30,13 @@ const HuddleSidebar = ({ onCreatePost, onShowProfile, onShowMessages }) => {
     fetchUser();
   }, []);
 
-  // Fetch unread messages and setup Socket.IO
+  
   useEffect(() => {
     if (!user) return;
 
     const fetchUnread = async () => {
       try {
-        const counts = await getUnreadCounts(); // [{ userId, count }]
+        const counts = await getUnreadCounts(); 
         setHasUnread(counts.length > 0);
       } catch (err) {
         console.error(err);
@@ -44,12 +44,12 @@ const HuddleSidebar = ({ onCreatePost, onShowProfile, onShowMessages }) => {
     };
     fetchUnread();
 
-    // Setup Socket.IO for real-time unread messages
+    
     socketRef.current = io(import.meta.env.VITE_API_BASE_URL, { withCredentials: true });
 
 
     socketRef.current.on("receiveMessage", (msg) => {
-      // If someone sends message to me
+     
       if (msg.receiver === user._id) {
         setHasUnread(true);
       }
@@ -59,7 +59,7 @@ const HuddleSidebar = ({ onCreatePost, onShowProfile, onShowMessages }) => {
   }, [user]);
 
   const handleMessagesClick = () => {
-    setHasUnread(false); // Clear dot when opening Messages
+    setHasUnread(false); 
     onShowMessages();
   };
 
@@ -86,7 +86,7 @@ const HuddleSidebar = ({ onCreatePost, onShowProfile, onShowMessages }) => {
   return (
     <div className="w-64 p-4 flex flex-col justify-between h-full bg-white border-r border-gray-100">
       <div>
-        {/* Logo */}
+       
         <div className="flex items-center space-x-2 mb-8 ml-2">
           <div className="w-6 h-6 rounded-full bg-yellow-600 flex items-center justify-center text-white p-1">
             <span className="text-xs font-bold">h</span>
@@ -94,10 +94,10 @@ const HuddleSidebar = ({ onCreatePost, onShowProfile, onShowMessages }) => {
           <span className="text-2xl font-bold text-gray-800">Huddle</span>
         </div>
 
-        {/* Sidebar Navigation */}
+       
         <nav className="space-y-2">
           {navItems.map((item) => {
-            // PROFILE BUTTON
+         
             if (item.name === "Profile") {
               return (
                 <button
@@ -112,7 +112,7 @@ const HuddleSidebar = ({ onCreatePost, onShowProfile, onShowMessages }) => {
               );
             }
 
-            // MESSAGES BUTTON
+            
             if (item.name === "Messages") {
               return (
                 <button
@@ -129,7 +129,7 @@ const HuddleSidebar = ({ onCreatePost, onShowProfile, onShowMessages }) => {
               );
             }
 
-            // OTHER NAVLINKS
+            
             return (
               <NavLink
                 key={item.name}
@@ -149,7 +149,7 @@ const HuddleSidebar = ({ onCreatePost, onShowProfile, onShowMessages }) => {
           })}
         </nav>
 
-        {/* Create Post Button */}
+        
         <button
           onClick={onCreatePost}
           className="mt-8 w-full py-3 rounded-xl bg-purple-600 text-white font-semibold shadow-md hover:bg-purple-700 transition-colors duration-200"
@@ -158,7 +158,7 @@ const HuddleSidebar = ({ onCreatePost, onShowProfile, onShowMessages }) => {
         </button>
       </div>
 
-      {/* User Info */}
+      
       <div className="flex items-center p-2 mt-auto">
         {renderAvatar()}
         <div className="ml-3">

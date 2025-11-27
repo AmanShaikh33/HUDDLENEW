@@ -131,7 +131,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
 
   return (
     <>
-      {/* POST CARD */}
+     
       <div
         className="w-full bg-white p-3 sm:p-4 rounded-3xl shadow-xl hover:shadow-2xl transition-all relative max-w-full mx-auto"
         onClick={() => {
@@ -139,7 +139,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
           setIsModalOpen(true);
         }}
       >
-        {/* HEADER */}
+        
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center">
             <div className="w-10 h-10 bg-gray-300 rounded-full mr-3 overflow-hidden flex items-center justify-center text-white font-bold text-lg">
@@ -165,7 +165,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
             </div>
           </div>
 
-          {/* MENU */}
+         
           {currentUserId === owner._id && (
             <div className="relative" ref={menuRef}>
               <button
@@ -207,7 +207,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
           )}
         </div>
 
-        {/* CAPTION */}
+        
         <div className="mb-4 text-gray-700">
           {isEditing ? (
             <div onClick={(e) => e.stopPropagation()}>
@@ -251,7 +251,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
           )}
         </div>
 
-        {/* MEDIA */}
+    
         {files?.length > 0 && (
           <div className="w-full bg-gray-100 rounded-lg mb-4 overflow-hidden">
             {files[0].type === "image" ? (
@@ -262,7 +262,6 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
           </div>
         )}
 
-        {/* ACTIONS */}
         <div className="flex flex-wrap justify-center items-center gap-3 mb-2">
           <button
             onClick={(e) => {
@@ -294,7 +293,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
         </div>
       </div>
 
-      {/* MODAL */}
+  
       {isModalOpen && (
         <CommentsModal
           postId={post._id}

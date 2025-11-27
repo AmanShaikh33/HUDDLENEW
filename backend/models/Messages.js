@@ -29,7 +29,7 @@ const messageSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Index for efficient querying (e.g., chat history between two users)
+
 messageSchema.index({ sender: 1, receiver: 1, timestamp: -1 });
 
 export const Message = mongoose.model("Message", messageSchema);

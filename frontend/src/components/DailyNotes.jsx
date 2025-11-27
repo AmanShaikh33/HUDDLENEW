@@ -9,7 +9,7 @@ const DailyNotes = () => {
   const [user, setUser] = useState(null);
   const [showMenuId, setShowMenuId] = useState(null);
 
-  // Fetch user
+  
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -71,12 +71,12 @@ const DailyNotes = () => {
   return (
     <div className="flex flex-col bg-white rounded-xl p-3 w-full md:w-72 shadow-sm border border-gray-200">
 
-      {/* Title */}
+ 
       <h3 className="text-base md:text-lg font-semibold mb-3 text-purple-600">
         Daily Thoughts
       </h3>
 
-      {/* Input */}
+     
       <div className="flex mb-3 md:mb-4 gap-2">
         <input
           type="text"
@@ -93,7 +93,7 @@ const DailyNotes = () => {
         </button>
       </div>
 
-      {/* Notes */}
+    
       <div className="space-y-3 max-h-[250px] md:max-h-full overflow-y-auto pr-1">
 
         {loading ? (
@@ -106,7 +106,7 @@ const DailyNotes = () => {
               key={note._id}
               className="flex items-start justify-between gap-2 p-2 bg-purple-50 rounded-lg"
             >
-              {/* Avatar + note content */}
+              
               <div className="flex items-start gap-2">
                 {note.user?.profilePic?.url ? (
                   <img
@@ -135,7 +135,7 @@ const DailyNotes = () => {
                 </div>
               </div>
 
-              {/* Menu */}
+              
               {note.user?._id === user?._id && (
                 <div className="relative">
                   <button

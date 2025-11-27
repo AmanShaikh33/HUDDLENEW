@@ -9,7 +9,7 @@ const ChatWindow = () => {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // REAL online/typing states
+  
   const [onlineUserIds, setOnlineUserIds] = useState(new Set());
   const [isTyping, setIsTyping] = useState(false);
 
@@ -19,19 +19,19 @@ const ChatWindow = () => {
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
 
-  // CONNECT SOCKET ONCE
+
   useEffect(() => {
     socketRef.current = io(import.meta.env.VITE_API_BASE_URL, {
       withCredentials: true,
       query: { userId: currentUser?._id },
     });
 
-    // RECEIVE MESSAGE
+ 
     socketRef.current.on("receiveMessage", (message) => {
       setMessages((prev) => [...prev, message]);
     });
 
-    // REAL ONLINE SYSTEM
+    
     socketRef.current.on("userOnline", (userId) => {
       setOnlineUserIds((prev) => new Set(prev).add(userId));
     });
@@ -44,7 +44,7 @@ const ChatWindow = () => {
       });
     });
 
-    // REAL typing indicator
+    
     socketRef.current.on("typing", (senderId) => {
       if (senderId === selectedUser?._id) setIsTyping(true);
     });
@@ -53,7 +53,7 @@ const ChatWindow = () => {
       if (senderId === selectedUser?._id) setIsTyping(false);
     });
 
-    // REAL seen update
+   
     socketRef.current.on("seenUpdate", (userId) => {
       if (userId === selectedUser?._id) {
         setMessages((prev) =>
@@ -65,7 +65,6 @@ const ChatWindow = () => {
     return () => socketRef.current.disconnect();
   }, [selectedUser]);
 
-  // LOAD CHAT WHEN USER SELECTS
   useEffect(() => {
     if (!selectedUser) return;
 
@@ -89,12 +88,12 @@ const ChatWindow = () => {
 
   }, [selectedUser]);
 
-  // SCROLL
+ 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // SEND MESSAGE
+
   const sendMessage = () => {
     if (!newMessage.trim()) return;
 
@@ -126,11 +125,11 @@ const ChatWindow = () => {
   return (
     <div className="flex flex-col h-full rounded-xl shadow-md bg-white overflow-hidden">
       
-      {/* HEADER */}
+      
       <div className="p-4 sticky top-0 z-10 flex items-center 
                       bg-white/90 backdrop-blur-md shadow-sm border-b">
 
-        {/* BACK BUTTON (mobile only) */}
+       
         <button
           onClick={() => setSelectedUser(null)}
           className="mr-3 block md:hidden text-purple-600 flex-shrink-0"
@@ -143,7 +142,7 @@ const ChatWindow = () => {
           </svg>
         </button>
 
-        {/* PROFILE PIC */}
+       
         <div className="flex-shrink-0">
           {selectedUser.profilePic?.url ? (
             <img
@@ -158,7 +157,7 @@ const ChatWindow = () => {
           )}
         </div>
 
-        {/* NAME + STATUS */}
+
         <div className="ml-3 flex flex-col">
           <h1 className="text-lg font-semibold text-gray-800 truncate">
             {selectedUser.name}
@@ -179,7 +178,7 @@ const ChatWindow = () => {
 
       </div>
 
-      {/* MESSAGES */}
+     
       <div className="flex-1 overflow-y-auto p-4 flex flex-col space-y-3">
 
         {loading ? (
@@ -203,18 +202,18 @@ const ChatWindow = () => {
                     ${isSent ? "bg-purple-600 text-white rounded-br-none" : "bg-gray-100 text-gray-800 rounded-bl-none"}
                   `}
                 >
-                  {/* MESSAGE TEXT */}
+                 
                   <p className="text-sm leading-relaxed break-words">
                     {msg.content}
                   </p>
 
-                  {/* TIME + TICKS */}
+                
                   <div className="flex items-center gap-1 justify-end mt-1 opacity-80">
                     <span className="text-[10px]">
                       {formatTime(msg.timestamp)}
                     </span>
 
-                    {/* TICKS */}
+                  
                     {isSent && (
                       <span className="text-[12px] ml-1 flex items-center">
                         {msg.seen ? (
@@ -226,7 +225,7 @@ const ChatWindow = () => {
                     )}
                   </div>
 
-                  {/* TAIL */}
+                
                   {isSent ? (
                     <div className="absolute bottom-0 right-0 translate-y-full w-0 h-0 
                                     border-t-[10px] border-t-purple-600 
@@ -245,14 +244,14 @@ const ChatWindow = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* TYPING INDICATOR BELOW CHAT */}
+    
       {isTyping && (
         <div className="px-4 pb-1 text-purple-500 text-xs animate-pulse">
           {selectedUser.name} is typing…
         </div>
       )}
 
-      {/* INPUT */}
+     
       <div className="p-4 flex-shrink-0 bg-white border-t">
         <div className="flex items-center space-x-3">
 

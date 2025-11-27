@@ -5,7 +5,7 @@ import getDataUrl from "../utils/urlGenrator.js";
 import cloudinary from "cloudinary";
 import bcrypt from "bcryptjs";
 
-// ------------------- GET OWN PROFILE -------------------
+
 export const myProfile = TryCatch(async (req, res) => {
   const user = await User.findById(req.user._id)
     .select("-password")
@@ -15,7 +15,7 @@ export const myProfile = TryCatch(async (req, res) => {
   res.json(user);
 });
 
-// ------------------- GET ANOTHER USER PROFILE -------------------
+
 export const userProfile = TryCatch(async (req, res) => {
   const user = await User.findById(req.params.id)
     .select("-password")
@@ -25,7 +25,7 @@ export const userProfile = TryCatch(async (req, res) => {
   if (!user)
     return res.status(404).json({ message: "No user with this ID" });
 
-  // Check if current user is following this user
+
   const isFollowing = user.followers.some(
     (follower) => follower._id.toString() === req.user._id.toString()
   );
@@ -33,7 +33,7 @@ export const userProfile = TryCatch(async (req, res) => {
   res.json({ ...user.toObject(), isFollowing });
 });
 
-// ------------------- FOLLOW / UNFOLLOW USER -------------------
+
 export const followandUnfollowUser = TryCatch(async (req, res) => {
   const user = await User.findById(req.params.id);
   const loggedInUser = await User.findById(req.user._id);
@@ -46,7 +46,7 @@ export const followandUnfollowUser = TryCatch(async (req, res) => {
   let badgeUnlocked = false;
 
   if (user.followers.includes(loggedInUser._id)) {
-    // 🟥 UNFOLLOW
+    
     user.followers = user.followers.filter(
       (id) => id.toString() !== loggedInUser._id.toString()
     );
@@ -55,22 +55,22 @@ export const followandUnfollowUser = TryCatch(async (req, res) => {
     );
     action = "unfollowed";
   } else {
-    // 🟩 FOLLOW
+  
     user.followers.push(loggedInUser._id);
     loggedInUser.followings.push(user._id);
     action = "followed";
 
-    // ✅ Create follow notification
+    
     if (user._id.toString() !== loggedInUser._id.toString()) {
       await Notification.create({
-        recipient: user._id,           // who receives the notification
-        sender: loggedInUser._id,      // who triggered it
+        recipient: user._id,           
+        sender: loggedInUser._id,      
         type: "follow",
         message: `${loggedInUser.name} started following you`,
       });
     }
 
-    // 🏅 Badge logic
+  
     const followerCount = user.followers.length;
     if (followerCount === 1 && !user.badges.oneFollower) {
       user.badges.oneFollower = true;
@@ -95,7 +95,7 @@ export const followandUnfollowUser = TryCatch(async (req, res) => {
   });
 });
 
-// ------------------- FOLLOWERS / FOLLOWINGS DATA -------------------
+
 export const userFollowerandFollowingData = TryCatch(async (req, res) => {
   const user = await User.findById(req.params.id)
     .select("-password")
@@ -113,7 +113,7 @@ export const userFollowerandFollowingData = TryCatch(async (req, res) => {
   });
 });
 
-// ------------------- UPDATE PROFILE -------------------
+
 export const updateProfile = TryCatch(async (req, res) => {
   const user = await User.findById(req.user._id);
   const { name, email, bio } = req.body;
@@ -143,7 +143,7 @@ export const updateProfile = TryCatch(async (req, res) => {
 
 
 
-// ------------------- UPDATE PASSWORD -------------------
+
 export const updatePassword = TryCatch(async (req, res) => {
   const user = await User.findById(req.user._id);
   const { oldPassword, newPassword } = req.body;
@@ -169,14 +169,14 @@ export const getFollowersOrFollowings = TryCatch(async (req, res) => {
 
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  // Get the requested list
+
   const list = user[type];
 
   // Paginate
   const startIndex = (page - 1) * limit;
   const paginatedList = list.slice(startIndex, startIndex + parseInt(limit));
 
-  // Populate only relevant fields
+
   const users = await User.find({ _id: { $in: paginatedList } })
     .select("name username profilePic");
 

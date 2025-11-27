@@ -16,17 +16,16 @@ export default function Feed({ refreshFeed }) {
     };
 
     fetchPosts();
-  }, [refreshFeed]); // 👈 Re-fetch whenever refreshFeed changes
+  }, [refreshFeed]); 
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-      {posts.length === 0 ? (
-        <p className="text-gray-500 text-center col-span-full">No posts yet</p>
-      ) : (
-        posts.map((post) => (
-          <HuddlePostCard key={post._id} postId={post._id} />
-        ))
-      )}
+    <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 p-4">
+  {posts.map((post) => (
+    <div key={post._id} className="break-inside-avoid mb-6">
+      <HuddlePostCard postId={post._id} />
     </div>
+  ))}
+</div>
+
   );
 }

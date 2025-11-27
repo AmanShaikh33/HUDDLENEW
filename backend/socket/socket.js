@@ -12,10 +12,9 @@ export const setupSocket = (server) => {
     },
   });
 
-  // Store online users (userId -> socketId)
+
   const onlineUsers = new Map();
 
-  // AUTH MIDDLEWARE
   io.use((socket, next) => {
     try {
       const cookies = socket.handshake.headers.cookie;
@@ -37,19 +36,19 @@ export const setupSocket = (server) => {
   io.on("connection", (socket) => {
     console.log(`User connected: ${socket.userId}`);
 
-    // register user as online
+    
     onlineUsers.set(socket.userId, socket.id);
 
-    // broadcast online status
+    
     io.emit("userOnline", socket.userId);
 
-    // JOIN PRIVATE CHAT ROOM
+   
     socket.on("joinChat", ({ otherUserId }) => {
       const room = [socket.userId, otherUserId].sort().join("-");
       socket.join(room);
       console.log(`User ${socket.userId} joined room: ${room}`);
 
-      // mark messages as seen when chat opened
+
       Message.updateMany(
         { sender: otherUserId, receiver: socket.userId, seen: false },
         { seen: true }
@@ -61,7 +60,7 @@ export const setupSocket = (server) => {
       });
     });
 
-    // SEND MESSAGE
+    
     socket.on("sendMessage", async ({ receiverId, content }) => {
       if (!receiverId || !content) return;
 
@@ -86,7 +85,7 @@ export const setupSocket = (server) => {
       }
     });
 
-    // TYPING INDICATOR
+    
     socket.on("typing", ({ receiverId }) => {
       const receiverSocket = onlineUsers.get(receiverId);
       if (receiverSocket) {
@@ -94,15 +93,15 @@ export const setupSocket = (server) => {
       }
     });
 
-    // STOP TYPING
-    socket.on("stopTyping", ({ receiverId }) => {
+   
+   socket.on("stopTyping", ({ receiverId }) => {
       const receiverSocket = onlineUsers.get(receiverId);
       if (receiverSocket) {
         io.to(receiverSocket).emit("stopTyping", socket.userId);
       }
     });
 
-    // MARK MESSAGE SEEN (Instagram style)
+   
     socket.on("messageSeen", ({ senderId }) => {
       Message.updateMany(
         { sender: senderId, receiver: socket.userId, seen: false },
@@ -115,7 +114,7 @@ export const setupSocket = (server) => {
       });
     });
 
-    // DISCONNECT
+    
     socket.on("disconnect", () => {
       onlineUsers.delete(socket.userId);
       io.emit("userOffline", socket.userId);

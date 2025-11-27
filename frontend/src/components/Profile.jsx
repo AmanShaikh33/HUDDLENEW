@@ -75,9 +75,9 @@ const ProfilePage = () => {
 
   return (
     <div className="p-4 md:p-6 bg-white rounded-xl h-full overflow-y-auto scrollbar-hide">
-      {/* HEADER */}
+     
       <div className="flex flex-col md:flex-row md:items-start items-center md:mb-6 mb-4">
-        {/* Avatar */}
+      
         <div className="w-24 h-24 md:w-28 md:h-28 rounded-full p-[2px] bg-yellow-500 mr-0 md:mr-4 mb-4 md:mb-0 flex items-center justify-center">
           <div className="w-full h-full rounded-full p-1 bg-white flex items-center justify-center">
             <img
@@ -88,7 +88,7 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* User Info */}
+      
         <div className="flex-1 text-center md:text-left">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-2">
             <div className="flex items-center justify-center md:justify-start text-2xl font-bold text-gray-800">
@@ -112,7 +112,7 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      {/* STATS */}
+    
       <div className="flex justify-center md:justify-center py-6 flex-wrap gap-6">
         {[
           { label: "Posts", value: posts.length },
@@ -147,7 +147,7 @@ const ProfilePage = () => {
         ))}
       </div>
 
-      {/* POSTS GRID */}
+     
       <div className="mt-6">
         <h2 className="text-lg font-semibold mb-4 text-center md:text-left">
           Your Posts

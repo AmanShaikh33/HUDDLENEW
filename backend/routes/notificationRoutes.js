@@ -1,4 +1,4 @@
-// routes/notificationRoutes.js
+
 import express from "express";
 import { getNotifications, markAllRead, clearAll } from "../controllers/notificationController.js";
 import { isAuth } from "../middlewares/isAuth.js";

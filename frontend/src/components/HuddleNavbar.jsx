@@ -12,7 +12,7 @@ const HuddleNavbar = ({ onUserSelect }) => {
 
   const searchRef = useRef(null);
 
-  // Close dropdown when clicking outside
+ 
   useEffect(() => {
     const handler = (e) => {
       if (searchRef.current && !searchRef.current.contains(e.target)) {
@@ -69,7 +69,7 @@ const HuddleNavbar = ({ onUserSelect }) => {
 
       <div className="flex items-center justify-between">
 
-        {/* Left: Logo */}
+      
         <div className="flex items-center space-x-2">
           <img src={H} alt="Huddle Logo" className="w-12 h-12 rounded-full" />
           <span className="hidden sm:block text-2xl font-bold text-gray-800">
@@ -77,7 +77,7 @@ const HuddleNavbar = ({ onUserSelect }) => {
           </span>
         </div>
 
-        {/* Hamburger (Mobile) */}
+        
         <button
           onClick={() => setShowMobileMenu(!showMobileMenu)}
           className="sm:hidden p-2 rounded-lg hover:bg-gray-100"
@@ -85,10 +85,10 @@ const HuddleNavbar = ({ onUserSelect }) => {
           <Menu className="w-6 h-6 text-gray-700" />
         </button>
 
-        {/* Search Bar – visible on ALL screens */}
+       
         <div ref={searchRef} className="relative w-full sm:w-96 mx-4">
 
-          {/* Search Input */}
+          
           <input
             type="text"
             placeholder="Search users..."
@@ -106,7 +106,7 @@ const HuddleNavbar = ({ onUserSelect }) => {
           />
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
 
-          {/* Results Dropdown */}
+        
           {showResults && results.length > 0 && (
             <div
               className="
@@ -149,7 +149,7 @@ const HuddleNavbar = ({ onUserSelect }) => {
           )}
         </div>
 
-        {/* Logout (Desktop) */}
+       
         <button
           onClick={handleLogout}
           className="hidden sm:flex items-center space-x-2 py-2 px-4 rounded-full bg-red-600 text-white hover:bg-red-700 transition"
@@ -159,11 +159,11 @@ const HuddleNavbar = ({ onUserSelect }) => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+  
       {showMobileMenu && (
         <div className="sm:hidden w-full bg-white shadow-lg border border-gray-200 rounded-lg p-4 mt-3">
 
-          {/* Mobile Logout */}
+         
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-full bg-red-600 text-white hover:bg-red-700 transition"

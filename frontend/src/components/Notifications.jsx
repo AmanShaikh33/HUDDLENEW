@@ -47,7 +47,7 @@ const NotificationsPage = () => {
         Notifications
       </h2>
 
-      {/* Clear Button */}
+  
       <div className="flex flex-wrap gap-2 mb-4 justify-center md:justify-start">
         <button
           onClick={handleClear}
@@ -65,7 +65,7 @@ const NotificationsPage = () => {
             <div
               key={n._id}
               onClick={() => {
-                // ⭐ FIXED: Works with HomePage event listener
+               
                 window.dispatchEvent(
                   new CustomEvent("openUserAccount", {
                     detail: n.sender._id,
@@ -79,7 +79,7 @@ const NotificationsPage = () => {
                 w-full cursor-pointer
               "
             >
-              {/* Profile Image */}
+            
               <div className="flex-shrink-0 mr-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-yellow-300 ring-2 ring-yellow-300">
                   <img
@@ -90,7 +90,7 @@ const NotificationsPage = () => {
                 </div>
               </div>
 
-              {/* Notification Text */}
+              
               <div className="flex-grow text-sm min-w-0">
                 <div className="flex items-center justify-between flex-wrap">
 
@@ -127,7 +127,7 @@ const NotificationsPage = () => {
                 </p>
               </div>
 
-              {/* Icon */}
+              
               <div className="flex-shrink-0 ml-3">
                 {getNotificationIcon(n.type)}
               </div>

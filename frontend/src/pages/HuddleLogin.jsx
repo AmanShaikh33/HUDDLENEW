@@ -19,20 +19,20 @@ const HuddleLogin = () => {
   setError("");
 
   try {
-    // ✅ API call — cookie-based login
+    
     const res = await loginUser(formData);
 
     console.log("✅ Login successful:", res);
 
-    // ✅ Store only user info, not token
+    
     if (res?.user) {
       localStorage.setItem("user", JSON.stringify(res.user));
     }
 
-    // ✅ Optional success alert
+  
     if (res?.message) alert(res.message);
 
-    // ✅ Redirect to homepage
+  
     navigate("/homepage", { replace: true });
   } catch (err) {
     console.error("❌ Login error:", err);

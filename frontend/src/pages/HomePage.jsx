@@ -28,18 +28,18 @@ const HomePage = () => {
 
   const handlePostAdded = () => setRefreshFeed((prev) => !prev);
 
-  // ⭐ LISTEN TO NAVBAR SEARCH CLICK
+  
   useEffect(() => {
     const openUser = (e) => {
       const id = e.detail;
 
-      // reset all sections
+   
       setShowProfile(false);
       setShowMessages(false);
       setShowNotifications(false);
       setShowNotes(false);
 
-      // open user account
+  
       setSelectedUserId(id);
       setActiveItem("UserAccount");
     };
@@ -103,7 +103,7 @@ const HomePage = () => {
             activeItem={activeItem}
           />
 
-          {/* CENTER CONTENT */}
+         
           <div className="flex-1 flex flex-col rounded-xl shadow-lg bg-white overflow-y-auto min-h-0">
 
             {showNotes ? (
@@ -129,13 +129,13 @@ const HomePage = () => {
 
           </div>
 
-          {/* RIGHT NOTES DESKTOP ONLY */}
+         
           <div className="hidden md:block w-80 rounded-xl shadow-lg bg-white p-4 flex-shrink-0 h-full">
             <DailyNotes />
           </div>
         </div>
 
-        {/* Create Post Modal */}
+        
         {isCreatePostOpen && (
           <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm">
             <CreatePostModal
@@ -149,9 +149,7 @@ const HomePage = () => {
   );
 };
 
-/* -----------------------------
-   CHAT MESSAGE RESPONSIVE LAYOUT
------------------------------- */
+
 
 const ChatMessagesLayout = () => {
   const { selectedUser, setSelectedUser } = useContext(ChatContext);
@@ -159,7 +157,7 @@ const ChatMessagesLayout = () => {
   return (
     <div className="flex h-full overflow-hidden min-h-0 relative">
 
-      {/* Left chat list */}
+     
       <div
         className={`
           w-full sm:w-80 h-full overflow-y-auto
@@ -170,7 +168,7 @@ const ChatMessagesLayout = () => {
         <ChatList />
       </div>
 
-      {/* Right chat window */}
+   
       <div
         className={`
           flex-1 h-full rounded-xl shadow-lg bg-white overflow-y-auto

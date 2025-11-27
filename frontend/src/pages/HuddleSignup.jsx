@@ -29,14 +29,15 @@ const HuddleSignUp = () => {
         data.append(key, formData[key]);
       });
 
-      // Temporary placeholders for fields backend expects
+    
       data.append("name", "");
       data.append("bio", "");
-      data.append("file", new Blob()); // dummy file placeholder if backend needs it
+      data.append("file", new Blob()); 
 
       const res = await registerUser(data);
       alert(res.message);
-      navigate("/"); // redirect to login page
+      navigate("/"); 
+      
     } catch (err) {
       setError(err.message || "Signup failed");
     } finally {
