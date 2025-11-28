@@ -37,7 +37,6 @@ export default function Feed({ refreshFeed }) {
   return (
     <div className="p-4 w-full h-full overflow-y-auto scrollbar-hide">
       <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
-
         {posts.map((post) => (
           <div
             key={post._id}
@@ -50,24 +49,22 @@ export default function Feed({ refreshFeed }) {
           >
             <div className="relative group">
 
-              {/* ✨ Hover zoom effect */}
-              <div className="overflow-hidden rounded-xl">
-                <HuddlePostCard postId={post._id} />
+              <HuddlePostCard postId={post._id} />
 
-                {/* Dark gradient hover */}
-                <div
-                  className="
-                    absolute inset-0 
-                    bg-gradient-to-t from-black/40 via-black/10 to-transparent 
-                    opacity-0 group-hover:opacity-100 
-                    transition-opacity duration-300
-                  "
-                ></div>
-              </div>
-
-              {/* ✨ Hover text (like Instagram explore) */}
+              
               <div
                 className="
+                  pointer-events-none
+                  absolute inset-0 
+                  bg-gradient-to-t from-black/40 via-black/10 to-transparent 
+                  opacity-0 group-hover:opacity-100 
+                  transition-opacity duration-300
+                "
+              ></div>
+
+              <div
+                className="
+                  pointer-events-none
                   absolute bottom-2 left-2 
                   text-white text-sm font-semibold 
                   opacity-0 group-hover:opacity-100 
@@ -80,7 +77,6 @@ export default function Feed({ refreshFeed }) {
             </div>
           </div>
         ))}
-
       </div>
     </div>
   );
