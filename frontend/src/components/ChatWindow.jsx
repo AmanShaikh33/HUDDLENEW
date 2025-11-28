@@ -110,33 +110,32 @@ const ChatWindow = () => {
     );
 
   return (
-   <div className="flex flex-col h-full bg-white relative 
-     md:rounded-xl md:border md:shadow">
-
+    <div className="flex flex-col h-full bg-white relative md:rounded-xl md:border md:shadow">
 
       {/* HEADER */}
-      <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 border-b bg-white">
-        <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center justify-between px-2 py-2 border-b bg-white">
+
+        <div className="flex items-center gap-2">
 
           {/* Avatar */}
           {selectedUser.profilePic?.url ? (
             <img
               src={selectedUser.profilePic.url}
               alt={selectedUser.name}
-              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
+              className="w-7 h-7 md:w-10 md:h-10 rounded-full object-cover"
             />
           ) : (
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-semibold text-sm sm:text-base">
+            <div className="w-7 h-7 md:w-10 md:h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-semibold text-sm md:text-base">
               {selectedUser.name[0].toUpperCase()}
             </div>
           )}
 
-          {/* Name + Status */}
+          {/* Name */}
           <div>
-            <p className="font-semibold text-gray-900 text-sm sm:text-base">
+            <p className="font-semibold text-gray-900 text-sm md:text-base">
               {selectedUser.name}
             </p>
-            <p className="text-[10px] sm:text-xs text-gray-500">
+            <p className="text-[10px] text-gray-500">
               {isTyping
                 ? "Typing…"
                 : onlineUserIds.has(selectedUser._id)
@@ -146,16 +145,16 @@ const ChatWindow = () => {
           </div>
         </div>
 
-        {/* Icons */}
-        <div className="flex items-center gap-2 text-yellow-600">
-          <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
-          <Video className="w-4 h-4 sm:w-5 sm:h-5" />
-          <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
+        {/* HIDDEN ON MOBILE */}
+        <div className="hidden md:flex items-center gap-3 text-yellow-600">
+          <Phone className="w-5 h-5" />
+          <Video className="w-5 h-5" />
+          <MoreVertical className="w-5 h-5" />
         </div>
       </div>
 
       {/* CHAT AREA */}
-      <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-3 bg-[#f7f5ff] space-y-3">
+      <div className="flex-1 overflow-y-auto px-3 py-3 bg-[#f7f5ff] space-y-3">
 
         {loading ? (
           <div className="text-gray-400 text-center mt-4 text-sm">Loading messages…</div>
@@ -171,7 +170,7 @@ const ChatWindow = () => {
                 className={`flex w-full ${isMine ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[80%] sm:max-w-[70%] px-3 sm:px-4 py-2 rounded-2xl sm:rounded-3xl shadow-sm text-xs sm:text-sm
+                  className={`max-w-[80%] md:max-w-[70%] px-3 py-2 rounded-2xl md:rounded-3xl shadow-sm text-xs md:text-sm
                   ${
                     isMine
                       ? "bg-purple-600 text-white rounded-br-none"
@@ -179,7 +178,7 @@ const ChatWindow = () => {
                   }`}
                 >
                   <p className="break-words">{msg.content}</p>
-                  <div className="text-[9px] sm:text-[10px] flex justify-end mt-1 opacity-80">
+                  <div className="text-[9px] md:text-[10px] flex justify-end mt-1 opacity-80">
                     {formatTime(msg.timestamp)}
                   </div>
                 </div>
@@ -193,7 +192,7 @@ const ChatWindow = () => {
 
       {/* EMOJI PICKER */}
       {showEmojiPicker && (
-        <div className="absolute bottom-20 left-2 sm:left-4 z-50 max-w-[250px] sm:max-w-none">
+        <div className="absolute bottom-20 left-2 z-50 max-w-[250px]">
           <EmojiPicker
             width={250}
             height={350}
@@ -203,19 +202,22 @@ const ChatWindow = () => {
       )}
 
       {/* INPUT BAR */}
-      <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 border-t bg-white">
+      <div className="flex items-center gap-2 px-3 py-2 border-t bg-white">
 
+        {/* Emoji */}
         <button
-          className="text-purple-500 p-1.5 sm:p-2 rounded-full hover:bg-purple-50"
+          className="text-purple-500 p-2 rounded-full hover:bg-purple-50"
           onClick={() => setShowEmojiPicker((p) => !p)}
         >
           <Smile className="w-5 h-5" />
         </button>
 
-        <button className="text-purple-500 p-1.5 sm:p-2 rounded-full hover:bg-purple-50">
+        {/* Attachment (hidden on mobile) */}
+        <button className="hidden md:block text-purple-500 p-2 rounded-full hover:bg-purple-50">
           <Paperclip className="w-5 h-5" />
         </button>
 
+        {/* Input */}
         <input
           value={newMessage}
           onChange={(e) => {
@@ -232,11 +234,11 @@ const ChatWindow = () => {
           className="flex-1 px-3 py-2 rounded-full border border-gray-300 focus:ring-2 focus:ring-purple-400 outline-none text-sm"
         />
 
+        {/* Send */}
         <button
           onClick={sendMessage}
-          className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-full flex items-center gap-1 hover:bg-purple-700"
+          className="px-3 py-2 bg-purple-600 text-white rounded-full flex items-center gap-1 hover:bg-purple-700"
         >
-          <span className="text-xs sm:text-sm font-medium">Send</span>
           <Send className="w-4 h-4 -rotate-45" />
         </button>
       </div>
