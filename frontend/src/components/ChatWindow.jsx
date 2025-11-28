@@ -113,59 +113,45 @@ const ChatWindow = () => {
     <div className="flex flex-col h-full bg-white relative md:rounded-xl md:border md:shadow">
 
       {/* HEADER */}
-      {/* HEADER */}
-<div className="flex items-center justify-between px-2 py-2 border-b bg-white">
+      <div className="flex items-center justify-between px-2 py-2 border-b bg-white">
 
-  {/* Left side: Avatar + Name */}
-  <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
 
-    {selectedUser.profilePic?.url ? (
-      <img
-        src={selectedUser.profilePic.url}
-        alt={selectedUser.name}
-        className="w-7 h-7 md:w-10 md:h-10 rounded-full object-cover"
-      />
-    ) : (
-      <div className="w-7 h-7 md:w-10 md:h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-semibold text-sm md:text-base">
-        {selectedUser.name[0].toUpperCase()}
+          {/* Avatar */}
+          {selectedUser.profilePic?.url ? (
+            <img
+              src={selectedUser.profilePic.url}
+              alt={selectedUser.name}
+              className="w-7 h-7 md:w-10 md:h-10 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-7 h-7 md:w-10 md:h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-semibold text-sm md:text-base">
+              {selectedUser.name[0].toUpperCase()}
+            </div>
+          )}
+
+          {/* Name */}
+          <div>
+            <p className="font-semibold text-gray-900 text-sm md:text-base">
+              {selectedUser.name}
+            </p>
+            <p className="text-[10px] text-gray-500">
+              {isTyping
+                ? "Typing…"
+                : onlineUserIds.has(selectedUser._id)
+                ? "Online"
+                : "Offline"}
+            </p>
+          </div>
+        </div>
+
+        {/* HIDDEN ON MOBILE */}
+        <div className="hidden md:flex items-center gap-3 text-yellow-600">
+          <Phone className="w-5 h-5" />
+          <Video className="w-5 h-5" />
+          <MoreVertical className="w-5 h-5" />
+        </div>
       </div>
-    )}
-
-    <div>
-      <p className="font-semibold text-gray-900 text-sm md:text-base">
-        {selectedUser.name}
-      </p>
-      <p className="text-[10px] text-gray-500">
-        {isTyping
-          ? "Typing…"
-          : onlineUserIds.has(selectedUser._id)
-          ? "Online"
-          : "Offline"}
-      </p>
-    </div>
-  </div>
-
-  {/* Right side: Back button (mobile only) + Call icons (desktop only) */}
-  <div className="flex items-center gap-3">
-
-    {/* Back Button SHOWN ONLY ON MOBILE */}
-    <button
-      onClick={() => window.history.back()}
-      className="md:hidden text-sm text-purple-600 font-semibold px-2 py-1 rounded-full hover:bg-purple-50"
-    >
-      Back →
-    </button>
-
-    {/* Call / Video / Menu (HIDDEN ON MOBILE) */}
-    <div className="hidden md:flex items-center gap-3 text-yellow-600">
-      <Phone className="w-5 h-5" />
-      <Video className="w-5 h-5" />
-      <MoreVertical className="w-5 h-5" />
-    </div>
-  </div>
-
-</div>
-
 
       {/* CHAT AREA */}
       <div className="flex-1 overflow-y-auto px-3 py-3 bg-[#f7f5ff] space-y-3">
