@@ -131,16 +131,20 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
 
   return (
     <>
-     
+      {/* ENTIRE CARD CLICK HANDLER */}
       <div
-        className="w-full bg-white p-3 sm:p-4 rounded-3xl shadow-xl hover:shadow-2xl transition-all relative max-w-full mx-auto"
+        className="w-full bg-white p-3 sm:p-4 rounded-3xl shadow-xl hover:shadow-2xl transition-all relative max-w-full mx-auto cursor-pointer"
         onClick={() => {
           document.body.classList.add("comments-open");
           setIsModalOpen(true);
         }}
       >
         
-        <div className="flex items-start justify-between mb-4">
+        {/* HEADER */}
+        <div
+          className="flex items-start justify-between mb-4"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="flex items-center">
             <div className="w-10 h-10 bg-gray-300 rounded-full mr-3 overflow-hidden flex items-center justify-center text-white font-bold text-lg">
               {owner.profilePic?.url ? (
@@ -165,7 +169,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
             </div>
           </div>
 
-         
+          {/* POST MENU */}
           {currentUserId === owner._id && (
             <div className="relative" ref={menuRef}>
               <button
@@ -207,10 +211,13 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
           )}
         </div>
 
-        
-        <div className="mb-4 text-gray-700">
+        {/* CAPTION */}
+        <div
+          className="mb-4 text-gray-700"
+          onClick={(e) => e.stopPropagation()}
+        >
           {isEditing ? (
-            <div onClick={(e) => e.stopPropagation()}>
+            <div>
               <textarea
                 value={newCaption}
                 onChange={(e) => setNewCaption(e.target.value)}
@@ -251,7 +258,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
           )}
         </div>
 
-    
+        {/* MEDIA */}
         {files?.length > 0 && (
           <div className="w-full bg-gray-100 rounded-lg mb-4 overflow-hidden">
             {files[0].type === "image" ? (
@@ -262,12 +269,13 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
           </div>
         )}
 
-        <div className="flex flex-wrap justify-center items-center gap-3 mb-2">
+        {/* ACTION BUTTONS */}
+        <div
+          className="flex flex-wrap justify-center items-center gap-3 mb-2"
+          onClick={(e) => e.stopPropagation()}
+        >
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleLike();
-            }}
+            onClick={handleLike}
             disabled={loadingLike}
             className={`flex items-center space-x-1 px-4 py-2 rounded-full font-medium transition ${
               liked
@@ -280,8 +288,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
           </button>
 
           <button
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={() => {
               document.body.classList.add("comments-open");
               setIsModalOpen(true);
             }}
@@ -293,7 +300,7 @@ const HuddlePostCard = ({ postId, onDeleteSuccess, onEditSuccess }) => {
         </div>
       </div>
 
-  
+      {/* COMMENT MODAL */}
       {isModalOpen && (
         <CommentsModal
           postId={post._id}
