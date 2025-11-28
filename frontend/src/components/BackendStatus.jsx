@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 
-export default function BackendStatus() {
+export default function BackendStatus({ children }) {
   const [backendReady, setBackendReady] = useState(false);
 
-  const backendURL =
-  import.meta.env.DEV
+  const backendURL = import.meta.env.DEV
     ? "http://localhost:7000/health"
     : "https://huddlenew-1.onrender.com/health";
-
 
   useEffect(() => {
     const checkBackend = async () => {
@@ -15,21 +13,15 @@ export default function BackendStatus() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-        const res = await fetch(backendURL, {
-          signal: controller.signal,
-        });
-
+        const res = await fetch(backendURL, { signal: controller.signal });
         clearTimeout(timeoutId);
 
         if (res.ok) {
           setBackendReady(true);
           return;
         }
-      } catch (err) {
-        // Backend not ready (sleeping), retry later
-      }
+      } catch (err) {}
 
-      
       setTimeout(checkBackend, 3000);
     };
 
@@ -38,17 +30,16 @@ export default function BackendStatus() {
 
   if (!backendReady) {
     return (
-      <div className="flex items-center justify-center h-screen flex-col text-center gap-2">
-        <div className="animate-spin h-10 w-10 border-4 border-gray-400 border-t-black rounded-full"></div>
+      <div className="fixed inset-0 bg-white z-[99999] flex items-center justify-center flex-col gap-3 overflow-hidden">
+        <div className="animate-spin h-12 w-12 border-4 border-gray-400 border-t-purple-600 rounded-full"></div>
         <p className="text-lg font-semibold">
           Backend is starting…  
           <br />
           Please wait 20–30 seconds.
-          render time leta he bhai wait kro
         </p>
       </div>
     );
   }
 
-  return null;
+  return children;
 }

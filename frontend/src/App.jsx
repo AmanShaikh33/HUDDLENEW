@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import HuddleLogin from "./pages/HuddleLogin";
@@ -9,16 +8,13 @@ import Profile from "./components/Profile";
 import PrivateRoute from "./components/PrivateRoute";
 import PublicRoute from "./components/PublicRoute";
 import UserAccount from "./components/UserAccount";
-import BackendStatus from "./components/BackendStatus"; 
+import BackendStatus from "./components/BackendStatus";
 
 function App() {
   return (
-    <>
-      <BackendStatus />
-
+    <BackendStatus>
       <Router>
         <Routes>
-    
           <Route
             path="/"
             element={
@@ -27,6 +23,7 @@ function App() {
               </PublicRoute>
             }
           />
+          
           <Route
             path="/signup"
             element={
@@ -36,7 +33,6 @@ function App() {
             }
           />
 
-         
           <Route
             path="/homepage"
             element={
@@ -53,7 +49,7 @@ function App() {
           </Route>
         </Routes>
       </Router>
-    </>
+    </BackendStatus>
   );
 }
 
