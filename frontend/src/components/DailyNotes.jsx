@@ -67,12 +67,14 @@ const DailyNotes = () => {
   };
 
   return (
-    <div className="flex flex-col bg-white rounded-xl p-3 w-full md:w-72 shadow-sm border border-gray-200">
+    <div className="flex flex-col bg-white rounded-xl p-3 w-full md:w-72 shadow-sm border border-gray-200 h-full">
 
+      {/* HEADER */}
       <h3 className="text-base md:text-lg font-semibold mb-3 text-purple-600">
         Daily Thoughts
       </h3>
 
+      {/* INPUT SECTION */}
       <div className="flex mb-3 md:mb-4 gap-2">
         <input
           type="text"
@@ -92,8 +94,8 @@ const DailyNotes = () => {
         </button>
       </div>
 
-      {/* SCROLLABLE NOTES LIST WITH HIDDEN SCROLLBAR */}
-      <div className="space-y-3 max-h-[250px] md:max-h-full overflow-y-auto pr-1 scrollbar-hide">
+      {/* ONLY THIS PART SCROLLS */}
+      <div className="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-hide">
 
         {loading ? (
           <p className="text-gray-500 text-sm">Loading...</p>
@@ -123,7 +125,7 @@ const DailyNotes = () => {
                     {note.user?.name}
                   </p>
 
-                  <p className="text-sm text-gray-800">{note.content}</p>
+                  <p className="text-sm text-gray-800 leading-tight">{note.content}</p>
 
                   <p className="text-xs text-gray-400">
                     {new Date(note.expiresAt).toLocaleTimeString([], {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { CheckCircle } from "lucide-react";
 import {
   getUserProfile,
@@ -6,8 +6,7 @@ import {
   followUnfollowUser,
   getFollowersOrFollowings,
 } from "../../api/api";
-
-import FollowListModal from "./FollowListModal"; // ⬅ ADDED
+import FollowListModal from "./FollowListModal";
 
 const UserAccount = ({ userId }) => {
   const [user, setUser] = useState(null);
@@ -15,65 +14,77 @@ const UserAccount = ({ userId }) => {
   const [followers, setFollowers] = useState(0);
   const [following, setFollowing] = useState(0);
   const [isFollowing, setIsFollowing] = useState(false);
+
   const [loading, setLoading] = useState(true);
 
-  // ⬅ ADDED FOR MODAL CONTROL
+  // Follow modal state
   const [followModalOpen, setFollowModalOpen] = useState(false);
   const [followType, setFollowType] = useState("followers");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userData = await getUserProfile(userId);
-        setUser(userData.user || userData);
+  // -------------------------------------------------
+  // ✔ OPTIMIZED FETCH (ALL API CALLS PARALLEL)
+  // -------------------------------------------------
+  const fetchUserData = useCallback(async () => {
+    try {
+      setLoading(true);
 
-        const allPostsResponse = await getAllPosts();
-        const allPosts = Array.isArray(allPostsResponse.posts)
-          ? allPostsResponse.posts
-          : [];
+      const [profileRes, postsRes] = await Promise.all([
+        getUserProfile(userId),
+        getAllPosts(),
+      ]);
 
-        const userPosts = allPosts.filter(
-          (p) => String(p.owner?._id || p.owner) === String(userId)
-        );
-        setPosts(userPosts);
+      const profile = profileRes.user || profileRes;
+      setUser(profile);
+      setIsFollowing(profileRes.isFollowing || false);
 
-        const followersData = await getFollowersOrFollowings(
-          userId,
-          "followers"
-        );
-        const followingData = await getFollowersOrFollowings(
-          userId,
-          "followings"
-        );
+      // Filter posts only once
+      const allPosts = Array.isArray(postsRes.posts) ? postsRes.posts : [];
+      const userPosts = allPosts.filter(
+        (p) => String(p.owner?._id || p.owner) === String(userId)
+      );
+      setPosts(userPosts);
 
-        setFollowers(followersData.total || followersData.length || 0);
-        setFollowing(followingData.total || followingData.length || 0);
+      // Fetch followers + followings parallel
+      const [followersData, followingData] = await Promise.all([
+        getFollowersOrFollowings(userId, "followers"),
+        getFollowersOrFollowings(userId, "followings"),
+      ]);
 
-        setIsFollowing(userData.isFollowing || false);
-      } catch (err) {
-        console.error("Error loading user:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+      setFollowers(followersData.total || followersData.length || 0);
+      setFollowing(followingData.total || followingData.length || 0);
+    } catch (err) {
+      console.error("UserAccount load error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [userId]);
 
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
+
+  // -------------------------------------------------
+  // ✔ FOLLOW / UNFOLLOW
+  // -------------------------------------------------
   const handleFollowToggle = async () => {
     try {
       const res = await followUnfollowUser(userId);
-      const newFollowState = res.isFollowing || !isFollowing;
-      setIsFollowing(newFollowState);
-      setFollowers((prev) => (newFollowState ? prev + 1 : prev - 1));
+      const newState = res.isFollowing || !isFollowing;
+      setIsFollowing(newState);
+
+      setFollowers((prev) => (newState ? prev + 1 : prev - 1));
     } catch (err) {
       console.error("Follow/Unfollow failed:", err);
-      alert(err.message || "Error performing action");
+      alert("Something went wrong.");
     }
   };
 
+  // -------------------------------------------------
+  // RENDER
+  // -------------------------------------------------
   if (loading)
     return <p className="text-center text-gray-500 mt-10">Loading user...</p>;
+
   if (!user)
     return <p className="text-center text-gray-500 mt-10">User not found.</p>;
 
@@ -81,8 +92,10 @@ const UserAccount = ({ userId }) => {
 
   return (
     <div className="p-4 md:p-6 bg-white rounded-xl h-full overflow-y-auto scrollbar-hide">
+
       {/* TOP SECTION */}
       <div className="flex items-start mb-6 flex-col sm:flex-row sm:items-center">
+        {/* Avatar */}
         <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full p-[2px] bg-yellow-500 mr-0 sm:mr-4 mb-4 sm:mb-0 flex items-center justify-center">
           <div className="w-full h-full rounded-full p-1 bg-white flex items-center justify-center">
             <img
@@ -93,6 +106,7 @@ const UserAccount = ({ userId }) => {
           </div>
         </div>
 
+        {/* Info */}
         <div className="flex-1 w-full">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full mb-2 gap-2">
             <div className="flex items-center text-xl sm:text-2xl font-bold text-gray-800">
@@ -118,7 +132,7 @@ const UserAccount = ({ userId }) => {
         </div>
       </div>
 
-      {/* FOLLOWERS SECTION */}
+      {/* FOLLOWERS / FOLLOWING */}
       <div className="flex justify-between sm:justify-center py-4 sm:py-6 gap-4 sm:gap-12">
         {[
           { label: "Posts", value: posts.length },
@@ -129,22 +143,13 @@ const UserAccount = ({ userId }) => {
             key={stat.label}
             className="flex flex-col items-center cursor-pointer"
             onClick={() => {
-              if (stat.label === "Followers") {
-                setFollowType("followers");
-                setFollowModalOpen(true);
-              }
-              if (stat.label === "Following") {
-                setFollowType("followings");
+              if (stat.label !== "Posts") {
+                setFollowType(stat.label === "Followers" ? "followers" : "followings");
                 setFollowModalOpen(true);
               }
             }}
           >
-            <div
-              className="flex items-center justify-center 
-                            w-16 h-16 sm:w-24 sm:h-24 
-                            rounded-full border-4 border-yellow-500 
-                            transition-all duration-300 hover:scale-105"
-            >
+            <div className="flex items-center justify-center w-16 h-16 sm:w-24 sm:h-24 rounded-full border-4 border-yellow-500 transition-all duration-300 hover:scale-105">
               <span className="text-lg sm:text-2xl font-bold text-gray-800">
                 {stat.value}
               </span>
@@ -156,11 +161,9 @@ const UserAccount = ({ userId }) => {
         ))}
       </div>
 
-      {/* POSTS SECTION */}
+      {/* POSTS */}
       <div className="mt-6">
-        <h2 className="text-lg font-semibold mb-4">
-          {user.username}'s Posts
-        </h2>
+        <h2 className="text-lg font-semibold mb-4">{user.username}'s Posts</h2>
 
         {posts.length === 0 ? (
           <p className="text-gray-500">No posts yet.</p>
@@ -175,6 +178,7 @@ const UserAccount = ({ userId }) => {
                   <img
                     src={post.files[0].url}
                     alt="Post"
+                    loading="lazy"
                     className="w-full h-32 sm:h-48 object-cover"
                   />
                 ) : (
@@ -184,6 +188,7 @@ const UserAccount = ({ userId }) => {
                     className="w-full h-32 sm:h-48 object-cover"
                   />
                 )}
+
                 {post.caption && (
                   <p className="p-2 text-gray-700 text-xs sm:text-sm">
                     {post.caption}
@@ -195,7 +200,7 @@ const UserAccount = ({ userId }) => {
         )}
       </div>
 
-      {/* FOLLOWERS / FOLLOWING MODAL */}
+      {/* FOLLOW MODAL */}
       {followModalOpen && (
         <FollowListModal
           userId={userId}

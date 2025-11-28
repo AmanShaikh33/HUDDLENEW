@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { CheckCircle } from "lucide-react";
 import EditProfileModal from "./EditProfileModal";
 import CommentsModal from "./CommentsModal";
@@ -14,55 +14,61 @@ const ProfilePage = () => {
   const [posts, setPosts] = useState([]);
   const [followers, setFollowers] = useState(0);
   const [following, setFollowing] = useState(0);
-  const [isEditOpen, setIsEditOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState(null);
 
   const [followModalOpen, setFollowModalOpen] = useState(false);
   const [followType, setFollowType] = useState("followers");
 
-  const fetchUserAndPosts = async () => {
-    setLoading(true);
+  // -----------------------------
+  // ✔ Optimized: Fetch everything in parallel
+  // -----------------------------
+  const fetchUserAndPosts = useCallback(async () => {
     try {
-      const userData = await getMyProfile();
-      const currentUser = userData.user || userData;
+      setLoading(true);
+
+      const [userRes, postsRes] = await Promise.all([
+        getMyProfile(),
+        getAllPosts(),
+      ]);
+
+      const currentUser = userRes.user || userRes;
       setUser(currentUser);
 
-      const allPostsResponse = await getAllPosts();
-      const allPostsArray = Array.isArray(allPostsResponse.posts)
-        ? allPostsResponse.posts
-        : [];
+      // ✔ Avoid filtering huge post list repeatedly
+      const allPosts = Array.isArray(postsRes.posts) ? postsRes.posts : [];
 
-      const userPosts = allPostsArray.filter(
-        (post) =>
-          String(post.owner?._id || post.owner) === String(currentUser._id)
+      const myPosts = allPosts.filter(
+        (p) => String(p.owner?._id || p.owner) === String(currentUser._id)
       );
-      setPosts(userPosts);
+      setPosts(myPosts);
 
-      const followersData = await getFollowersOrFollowings(
-        currentUser._id,
-        "followers"
-      );
-      const followingData = await getFollowersOrFollowings(
-        currentUser._id,
-        "followings"
-      );
+      // ✔ Fetch followers + following in parallel
+      const [followersData, followingData] = await Promise.all([
+        getFollowersOrFollowings(currentUser._id, "followers"),
+        getFollowersOrFollowings(currentUser._id, "followings"),
+      ]);
 
       setFollowers(followersData.total || followersData.length || 0);
       setFollowing(followingData.total || followingData.length || 0);
-    } catch (error) {
-      console.error("Fetch user or posts error:", error.message);
+    } catch (err) {
+      console.error("Profile fetch error:", err);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchUserAndPosts();
   }, []);
 
+  // Run once
+  useEffect(() => {
+    fetchUserAndPosts();
+  }, [fetchUserAndPosts]);
+
+  // -----------------------------
+  // Loading UI
+  // -----------------------------
   if (loading)
     return (
       <p className="text-center text-gray-500 mt-10">Loading profile...</p>
@@ -73,11 +79,16 @@ const ProfilePage = () => {
 
   const avatarUrl = user.profilePic?.url || "/default-profile.png";
 
+  // -----------------------------
+  // Render
+  // -----------------------------
   return (
     <div className="p-4 md:p-6 bg-white rounded-xl h-full overflow-y-auto scrollbar-hide">
-     
+
+      {/* TOP - Avatar + Username */}
       <div className="flex flex-col md:flex-row md:items-start items-center md:mb-6 mb-4">
-      
+
+        {/* Avatar */}
         <div className="w-24 h-24 md:w-28 md:h-28 rounded-full p-[2px] bg-yellow-500 mr-0 md:mr-4 mb-4 md:mb-0 flex items-center justify-center">
           <div className="w-full h-full rounded-full p-1 bg-white flex items-center justify-center">
             <img
@@ -88,7 +99,7 @@ const ProfilePage = () => {
           </div>
         </div>
 
-      
+        {/* Username & Edit */}
         <div className="flex-1 text-center md:text-left">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-2">
             <div className="flex items-center justify-center md:justify-start text-2xl font-bold text-gray-800">
@@ -98,11 +109,8 @@ const ProfilePage = () => {
 
             <button
               onClick={() => setIsEditOpen(true)}
-              className="
-                py-2 px-5 rounded-full bg-purple-600 text-white font-semibold 
-                text-sm hover:bg-purple-700 shadow-md
-                mt-3 md:mt-0
-              "
+              className="py-2 px-5 rounded-full bg-purple-600 text-white font-semibold 
+                         text-sm hover:bg-purple-700 shadow-md mt-3 md:mt-0"
             >
               Edit Profile
             </button>
@@ -112,7 +120,7 @@ const ProfilePage = () => {
         </div>
       </div>
 
-    
+      {/* Stats */}
       <div className="flex justify-center md:justify-center py-6 flex-wrap gap-6">
         {[
           { label: "Posts", value: posts.length },
@@ -121,21 +129,16 @@ const ProfilePage = () => {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="flex flex-col items-center cursor-pointer"
             onClick={() => {
-              if (stat.label === "Followers") setFollowType("followers");
-              if (stat.label === "Following") setFollowType("followings");
-              if (stat.label !== "Posts") setFollowModalOpen(true);
+              if (stat.label !== "Posts") {
+                setFollowType(stat.label === "Followers" ? "followers" : "followings");
+                setFollowModalOpen(true);
+              }
             }}
+            className="flex flex-col items-center cursor-pointer"
           >
-            <div
-              className="
-                flex items-center justify-center 
-                w-20 h-20 md:w-28 md:h-28 
-                rounded-full border-4 border-yellow-500 
-                transition-all duration-300 hover:scale-105
-              "
-            >
+            <div className="flex items-center justify-center w-20 h-20 md:w-28 md:h-28 
+                            rounded-full border-4 border-yellow-500 transition-all duration-300 hover:scale-105">
               <span className="text-xl md:text-2xl font-bold text-gray-800">
                 {stat.value}
               </span>
@@ -147,7 +150,7 @@ const ProfilePage = () => {
         ))}
       </div>
 
-     
+      {/* Posts Section */}
       <div className="mt-6">
         <h2 className="text-lg font-semibold mb-4 text-center md:text-left">
           Your Posts
@@ -160,10 +163,8 @@ const ProfilePage = () => {
             {posts.map((post) => (
               <div
                 key={post._id}
-                className="
-                  rounded-md overflow-hidden bg-gray-50 shadow-sm 
-                  cursor-pointer hover:shadow-md transition-all
-                "
+                className="rounded-md overflow-hidden bg-gray-50 shadow-sm 
+                           cursor-pointer hover:shadow-md transition-all"
                 onClick={() => {
                   setSelectedPostId(post._id);
                   setIsModalOpen(true);
@@ -174,6 +175,7 @@ const ProfilePage = () => {
                     <img
                       src={post.files[0].url}
                       alt="Post"
+                      loading="lazy"
                       className="w-full h-36 sm:h-40 md:h-48 object-cover"
                     />
                   ) : (
@@ -198,7 +200,7 @@ const ProfilePage = () => {
         )}
       </div>
 
-      {/* MODALS */}
+      {/* Modals */}
       {isModalOpen && selectedPostId && (
         <CommentsModal
           postId={selectedPostId}
