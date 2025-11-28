@@ -56,7 +56,7 @@ const ChatWindow = () => {
     return () => socketRef.current?.disconnect();
   }, [currentUser, selectedUser?._id]);
 
-  // LOAD CHAT HISTORY
+  // LOAD HISTORY
   useEffect(() => {
     if (!selectedUser) return;
 
@@ -76,7 +76,7 @@ const ChatWindow = () => {
     socketRef.current.emit("messageSeen", { senderId: selectedUser._id });
   }, [selectedUser]);
 
-  // AUTO SCROLL
+  // SCROLL TO BOTTOM
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -113,25 +113,28 @@ const ChatWindow = () => {
     <div className="flex flex-col h-full bg-white rounded-xl border shadow relative">
 
       {/* HEADER */}
-      <div className="flex items-center justify-between px-4 py-3 border-b bg-white">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 border-b bg-white">
+        <div className="flex items-center gap-2 sm:gap-3">
+
           {/* Avatar */}
           {selectedUser.profilePic?.url ? (
             <img
               src={selectedUser.profilePic.url}
               alt={selectedUser.name}
-              className="w-10 h-10 rounded-full object-cover"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
             />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-semibold">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-semibold text-sm sm:text-base">
               {selectedUser.name[0].toUpperCase()}
             </div>
           )}
 
           {/* Name + Status */}
           <div>
-            <p className="font-semibold text-gray-900">{selectedUser.name}</p>
-            <p className="text-xs text-gray-500">
+            <p className="font-semibold text-gray-900 text-sm sm:text-base">
+              {selectedUser.name}
+            </p>
+            <p className="text-[10px] sm:text-xs text-gray-500">
               {isTyping
                 ? "Typing…"
                 : onlineUserIds.has(selectedUser._id)
@@ -141,19 +144,21 @@ const ChatWindow = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 text-yellow-600">
-          <Phone className="w-5 h-5" />
-          <Video className="w-5 h-5" />
-          <MoreVertical className="w-5 h-5" />
+        {/* Icons */}
+        <div className="flex items-center gap-2 text-yellow-600">
+          <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
+          <Video className="w-4 h-4 sm:w-5 sm:h-5" />
+          <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
       </div>
 
-      {/* CHAT AREA (scrollable) */}
-      <div className="flex-1 overflow-y-auto min-h-0 px-4 py-3 bg-[#f7f5ff] space-y-3">
+      {/* CHAT AREA */}
+      <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-3 bg-[#f7f5ff] space-y-3">
+
         {loading ? (
-          <div className="text-gray-400 text-center mt-4">Loading messages…</div>
+          <div className="text-gray-400 text-center mt-4 text-sm">Loading messages…</div>
         ) : messages.length === 0 ? (
-          <div className="text-gray-400 text-center mt-4">No messages yet</div>
+          <div className="text-gray-400 text-center mt-4 text-sm">No messages yet</div>
         ) : (
           messages.map((msg) => {
             const isMine = msg.sender._id === currentUser?._id;
@@ -164,11 +169,15 @@ const ChatWindow = () => {
                 className={`flex w-full ${isMine ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[70%] px-4 py-2 rounded-3xl shadow-sm text-sm 
-                  ${isMine ? "bg-purple-600 text-white rounded-br-none" : "bg-white text-gray-800 rounded-bl-none"}`}
+                  className={`max-w-[80%] sm:max-w-[70%] px-3 sm:px-4 py-2 rounded-2xl sm:rounded-3xl shadow-sm text-xs sm:text-sm
+                  ${
+                    isMine
+                      ? "bg-purple-600 text-white rounded-br-none"
+                      : "bg-white text-gray-800 rounded-bl-none"
+                  }`}
                 >
                   <p className="break-words">{msg.content}</p>
-                  <div className="text-[10px] flex justify-end mt-1 opacity-80">
+                  <div className="text-[9px] sm:text-[10px] flex justify-end mt-1 opacity-80">
                     {formatTime(msg.timestamp)}
                   </div>
                 </div>
@@ -182,24 +191,26 @@ const ChatWindow = () => {
 
       {/* EMOJI PICKER */}
       {showEmojiPicker && (
-        <div className="absolute bottom-20 left-4 z-50">
+        <div className="absolute bottom-20 left-2 sm:left-4 z-50 max-w-[250px] sm:max-w-none">
           <EmojiPicker
+            width={250}
+            height={350}
             onEmojiClick={(emoji) => setNewMessage((prev) => prev + emoji.emoji)}
           />
         </div>
       )}
 
       {/* INPUT BAR */}
-      <div className="flex items-center gap-3 px-4 py-3 border-t bg-white">
+      <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 border-t bg-white">
 
         <button
-          className="text-purple-500 p-2 rounded-full hover:bg-purple-50"
+          className="text-purple-500 p-1.5 sm:p-2 rounded-full hover:bg-purple-50"
           onClick={() => setShowEmojiPicker((p) => !p)}
         >
           <Smile className="w-5 h-5" />
         </button>
 
-        <button className="text-purple-500 p-2 rounded-full hover:bg-purple-50">
+        <button className="text-purple-500 p-1.5 sm:p-2 rounded-full hover:bg-purple-50">
           <Paperclip className="w-5 h-5" />
         </button>
 
@@ -216,14 +227,14 @@ const ChatWindow = () => {
           }
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
           placeholder="Type a message..."
-          className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:ring-2 focus:ring-purple-400 outline-none"
+          className="flex-1 px-3 py-2 rounded-full border border-gray-300 focus:ring-2 focus:ring-purple-400 outline-none text-sm"
         />
 
         <button
           onClick={sendMessage}
-          className="px-4 py-2 bg-purple-600 text-white rounded-full flex items-center gap-1 hover:bg-purple-700"
+          className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-full flex items-center gap-1 hover:bg-purple-700"
         >
-          <span className="text-sm font-medium">Send</span>
+          <span className="text-xs sm:text-sm font-medium">Send</span>
           <Send className="w-4 h-4 -rotate-45" />
         </button>
       </div>
