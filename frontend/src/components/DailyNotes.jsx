@@ -9,7 +9,6 @@ const DailyNotes = () => {
   const [user, setUser] = useState(null);
   const [showMenuId, setShowMenuId] = useState(null);
 
-  
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -22,7 +21,6 @@ const DailyNotes = () => {
     fetchUser();
   }, []);
 
-  // Fetch notes
   const fetchNotes = async () => {
     try {
       setLoading(true);
@@ -71,30 +69,31 @@ const DailyNotes = () => {
   return (
     <div className="flex flex-col bg-white rounded-xl p-3 w-full md:w-72 shadow-sm border border-gray-200">
 
- 
       <h3 className="text-base md:text-lg font-semibold mb-3 text-purple-600">
         Daily Thoughts
       </h3>
 
-     
       <div className="flex mb-3 md:mb-4 gap-2">
         <input
           type="text"
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}
           placeholder="Share a thought..."
-          className="flex-1 text-sm border border-gray-300 rounded-full px-3 py-2 focus:outline-none focus:ring-1 focus:ring-purple-400"
+          className="flex-1 text-sm border border-gray-300 rounded-full px-3 py-2 
+                     focus:outline-none focus:ring-1 focus:ring-purple-400"
         />
+
         <button
           onClick={handleCreateNote}
-          className="bg-purple-600 text-white px-4 py-2 rounded-full text-xs md:text-sm hover:bg-purple-700 transition"
+          className="bg-purple-600 text-white px-4 py-2 rounded-full 
+                     text-xs md:text-sm hover:bg-purple-700 transition"
         >
           Post
         </button>
       </div>
 
-    
-      <div className="space-y-3 max-h-[250px] md:max-h-full overflow-y-auto pr-1">
+      {/* SCROLLABLE NOTES LIST WITH HIDDEN SCROLLBAR */}
+      <div className="space-y-3 max-h-[250px] md:max-h-full overflow-y-auto pr-1 scrollbar-hide">
 
         {loading ? (
           <p className="text-gray-500 text-sm">Loading...</p>
@@ -106,7 +105,6 @@ const DailyNotes = () => {
               key={note._id}
               className="flex items-start justify-between gap-2 p-2 bg-purple-50 rounded-lg"
             >
-              
               <div className="flex items-start gap-2">
                 {note.user?.profilePic?.url ? (
                   <img
@@ -124,7 +122,9 @@ const DailyNotes = () => {
                   <p className="text-xs font-semibold text-gray-700">
                     {note.user?.name}
                   </p>
+
                   <p className="text-sm text-gray-800">{note.content}</p>
+
                   <p className="text-xs text-gray-400">
                     {new Date(note.expiresAt).toLocaleTimeString([], {
                       hour: "2-digit",
@@ -135,7 +135,6 @@ const DailyNotes = () => {
                 </div>
               </div>
 
-              
               {note.user?._id === user?._id && (
                 <div className="relative">
                   <button
