@@ -50,7 +50,7 @@ const HomePage = () => {
 
   return (
     <UserContextProvider>
-      <div className="flex flex-col h-screen bg-gray-100 gap-2 px-4 pt-4 pb-20 md:pb-4 overflow-x-hidden">
+      <div className="flex flex-col h-screen bg-gray-100 gap-2 px-4 pt-4 pb-20 md:pb-4 overflow-x-hidden ">
 
         {/* Navbar */}
         <div className="flex-shrink-0 mx-auto w-full max-w-[1600px]">
@@ -104,7 +104,7 @@ const HomePage = () => {
           />
 
          
-          <div className="flex-1 flex flex-col rounded-xl shadow-lg bg-white overflow-y-auto min-h-0">
+          <div className="flex-1 flex flex-col rounded-xl shadow-lg bg-white overflow-y-auto min-h-0 scrollbar-hide">
 
             {showNotes ? (
               <DailyNotes />
@@ -130,7 +130,7 @@ const HomePage = () => {
           </div>
 
          
-          <div className="hidden md:block w-80 rounded-xl shadow-lg bg-white p-4 flex-shrink-0 h-full">
+          <div className="hidden md:block w-80 rounded-xl shadow-lg bg-white p-4 flex-shrink-0 h-full scrollbar-hide">
             <DailyNotes />
           </div>
         </div>
@@ -155,14 +155,14 @@ const ChatMessagesLayout = () => {
   const { selectedUser, setSelectedUser } = useContext(ChatContext);
 
   return (
-    <div className="flex h-full overflow-hidden min-h-0 relative">
+    <div className="flex h-full overflow-hidden min-h-0 relative ">
 
      
       <div
         className={`
           w-full sm:w-80 h-full overflow-y-auto
           ${selectedUser ? "hidden sm:block" : "block"}
-          rounded-xl shadow-lg bg-white p-2
+          rounded-xl shadow-lg bg-white p-2 
         `}
       >
         <ChatList />
@@ -171,14 +171,14 @@ const ChatMessagesLayout = () => {
    
       <div
         className={`
-          flex-1 h-full rounded-xl shadow-lg bg-white overflow-y-auto
+          flex-1 h-full rounded-xl shadow-lg bg-white overflow-y-auto 
           ${selectedUser ? "block" : "hidden sm:block"}
         `}
       >
 
         {selectedUser && (
           <button
-            className="sm:hidden absolute top-3 left-3 z-20 bg-white shadow px-3 py-1 rounded-full text-sm"
+            className="sm:hidden absolute top-3 left-3 z-20 bg-white shadow px-3 py-1 rounded-full text-sm "
             onClick={() => setSelectedUser(null)}
           >
             ← Back

@@ -3,7 +3,11 @@ import { useEffect, useState } from "react";
 export default function BackendStatus() {
   const [backendReady, setBackendReady] = useState(false);
 
-  const backendURL = "https://huddlenew-1.onrender.com/health";
+  const backendURL =
+  import.meta.env.DEV
+    ? "http://localhost:7000/health"
+    : "https://huddlenew-1.onrender.com/health";
+
 
   useEffect(() => {
     const checkBackend = async () => {

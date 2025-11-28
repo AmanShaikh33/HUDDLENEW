@@ -7,6 +7,8 @@ import {
   getFollowersOrFollowings,
 } from "../../api/api";
 
+import FollowListModal from "./FollowListModal"; // ⬅ ADDED
+
 const UserAccount = ({ userId }) => {
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -14,6 +16,10 @@ const UserAccount = ({ userId }) => {
   const [following, setFollowing] = useState(0);
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // ⬅ ADDED FOR MODAL CONTROL
+  const [followModalOpen, setFollowModalOpen] = useState(false);
+  const [followType, setFollowType] = useState("followers");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,8 +37,14 @@ const UserAccount = ({ userId }) => {
         );
         setPosts(userPosts);
 
-        const followersData = await getFollowersOrFollowings(userId, "followers");
-        const followingData = await getFollowersOrFollowings(userId, "followings");
+        const followersData = await getFollowersOrFollowings(
+          userId,
+          "followers"
+        );
+        const followingData = await getFollowersOrFollowings(
+          userId,
+          "followings"
+        );
 
         setFollowers(followersData.total || followersData.length || 0);
         setFollowing(followingData.total || followingData.length || 0);
@@ -69,11 +81,8 @@ const UserAccount = ({ userId }) => {
 
   return (
     <div className="p-4 md:p-6 bg-white rounded-xl h-full overflow-y-auto scrollbar-hide">
-
-      
+      {/* TOP SECTION */}
       <div className="flex items-start mb-6 flex-col sm:flex-row sm:items-center">
-
-        
         <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full p-[2px] bg-yellow-500 mr-0 sm:mr-4 mb-4 sm:mb-0 flex items-center justify-center">
           <div className="w-full h-full rounded-full p-1 bg-white flex items-center justify-center">
             <img
@@ -84,12 +93,8 @@ const UserAccount = ({ userId }) => {
           </div>
         </div>
 
-    
         <div className="flex-1 w-full">
-
-        
           <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full mb-2 gap-2">
-            
             <div className="flex items-center text-xl sm:text-2xl font-bold text-gray-800">
               @{user.username}
               <CheckCircle className="w-5 h-5 ml-2 text-yellow-500 fill-yellow-500" />
@@ -107,26 +112,39 @@ const UserAccount = ({ userId }) => {
             </button>
           </div>
 
-         
           <p className="text-sm text-gray-600 break-words">
             {user.bio || "No bio yet."}
           </p>
-
         </div>
       </div>
 
-     
+      {/* FOLLOWERS SECTION */}
       <div className="flex justify-between sm:justify-center py-4 sm:py-6 gap-4 sm:gap-12">
         {[
           { label: "Posts", value: posts.length },
           { label: "Followers", value: followers },
           { label: "Following", value: following },
         ].map((stat) => (
-          <div key={stat.label} className="flex flex-col items-center">
-            <div className="flex items-center justify-center 
+          <div
+            key={stat.label}
+            className="flex flex-col items-center cursor-pointer"
+            onClick={() => {
+              if (stat.label === "Followers") {
+                setFollowType("followers");
+                setFollowModalOpen(true);
+              }
+              if (stat.label === "Following") {
+                setFollowType("followings");
+                setFollowModalOpen(true);
+              }
+            }}
+          >
+            <div
+              className="flex items-center justify-center 
                             w-16 h-16 sm:w-24 sm:h-24 
                             rounded-full border-4 border-yellow-500 
-                            transition-all duration-300 hover:scale-105">
+                            transition-all duration-300 hover:scale-105"
+            >
               <span className="text-lg sm:text-2xl font-bold text-gray-800">
                 {stat.value}
               </span>
@@ -138,7 +156,7 @@ const UserAccount = ({ userId }) => {
         ))}
       </div>
 
-      
+      {/* POSTS SECTION */}
       <div className="mt-6">
         <h2 className="text-lg font-semibold mb-4">
           {user.username}'s Posts
@@ -177,6 +195,14 @@ const UserAccount = ({ userId }) => {
         )}
       </div>
 
+      {/* FOLLOWERS / FOLLOWING MODAL */}
+      {followModalOpen && (
+        <FollowListModal
+          userId={userId}
+          type={followType}
+          onClose={() => setFollowModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

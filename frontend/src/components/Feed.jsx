@@ -19,7 +19,7 @@ export default function Feed({ refreshFeed }) {
   }, [refreshFeed]); 
 
   return (
-    <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 p-4">
+    <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 p-4 ">
   {posts.map((post) => (
     <div key={post._id} className="break-inside-avoid mb-6">
       <HuddlePostCard postId={post._id} />
