@@ -110,7 +110,9 @@ const ChatWindow = () => {
     );
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-xl border shadow relative">
+   <div className="flex flex-col h-full bg-white relative 
+     md:rounded-xl md:border md:shadow">
+
 
       {/* HEADER */}
       <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 border-b bg-white">
