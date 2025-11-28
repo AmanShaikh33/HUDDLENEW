@@ -28,7 +28,7 @@ const HomePage = () => {
 
   const handlePostAdded = () => setRefreshFeed((prev) => !prev);
 
-  // Handle events fired from Feed → open user profile
+  // OPEN USER ACCOUNT (from feed event)
   useEffect(() => {
     const openUser = (e) => {
       const id = e.detail;
@@ -101,8 +101,8 @@ const HomePage = () => {
             activeItem={activeItem}
           />
 
-          {/* PAGE CONTENT (THIS WAS THE BROKEN PART — FIXED) */}
-          <div className="flex-1 flex flex-col rounded-xl shadow-lg bg-white min-h-0">
+          {/* ===== FIXED PAGE CONTENT WRAPPER ===== */}
+          <div className="flex-1 flex flex-col bg-white min-h-0 md:rounded-xl md:shadow-lg">
 
             {showNotes ? (
               <DailyNotes />
@@ -147,10 +147,8 @@ const HomePage = () => {
   );
 };
 
-
-
 // --------------------------------------------------------------
-// CHAT MESSAGES LAYOUT (THIS WAS ALSO BROKEN — NOW FIXED)
+// CHAT MESSAGES LAYOUT
 // --------------------------------------------------------------
 const ChatMessagesLayout = () => {
   const { selectedUser, setSelectedUser } = useContext(ChatContext);
@@ -169,10 +167,10 @@ const ChatMessagesLayout = () => {
         <ChatList />
       </div>
 
-      {/* CHAT WINDOW (THE MAIN FIX) */}
+      {/* CHAT WINDOW */}
       <div
         className={`
-          flex-1 flex flex-col h-full rounded-xl shadow-lg bg-white min-h-0
+          flex-1 flex flex-col h-full bg-white min-h-0 md:rounded-xl md:shadow-lg
           ${selectedUser ? "block" : "hidden sm:block"}
         `}
       >

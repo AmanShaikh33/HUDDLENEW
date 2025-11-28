@@ -36,7 +36,7 @@ export default function BackendStatus({ children }) {
           Backend is starting…  
           <br />
           Please wait 20–30 seconds.
-          render time leta he 
+          render takes time 
         </p>
       </div>
     );
